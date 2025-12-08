@@ -1,0 +1,170 @@
+Mettre une SFM state machine
+
+
+
+
+
+
+
+
+
+
+
+Allumage :
+
+&nbsp;	Mode init --> veille
+
+&nbsp;	all --> 0
+
+&nbsp;	
+
+&nbsp;	Detection active --> ouverture trappe avec servo 
+
+&nbsp;	Mode prepa genral active 
+
+&nbsp;	si >1 min sans interaction donc pas bouton BpArm --> ferme trappe, retour mode veille
+
+
+
+&nbsp;	si BpArm press :
+
+
+
+&nbsp;		Boite active, ne peu plsu ce mettre en veuille , tout s'allume 
+
+
+
+&nbsp;		**tant que choix pas valide, si rappuie sur BpArm, shutdown general : retour a Mode prepa general active**
+
+
+
+&nbsp;	
+
+&nbsp;		Mode Commute choix : cycle des 2 mode : 
+
+&nbsp;			--> 2 choix : mode 1 (auto : detection bip boom) ; mode 2 (boom retarder)
+
+&nbsp;				--> appuie sur bouton BpConfirm --> lock le mode --> prepa mode active
+
+&nbsp;				
+
+&nbsp;				si mode 1 :
+
+&nbsp;					confirmation final : appuie bouton confirmation BpConfirm --> affichage message, etc 
+
+&nbsp;					ferme trap
+
+
+
+&nbsp;				si mode 2 :
+
+&nbsp;					allumage clock (affiche 00:00) 
+
+&nbsp;					ecran affiche "selection temps"
+
+&nbsp;					avec paver num -- > rentre les 4 valeurs, \* pour retirer valeur precedent -> valeur remplacer par 0
+
+&nbsp;				    2.1 appuie BpConfirm : valide temps 
+
+&nbsp;					ecran affiche "choisir code pin" jusqua 9 chiffre (se cque on peu afficher au max)
+
+&nbsp;				    2.2 appuie BpConfirm : valide code 
+
+&nbsp;					ecran affiche " tes sur mec ?"
+
+&nbsp;				    2.3 appuie BpConfirm : armement final
+
+&nbsp;					ferme trap 
+
+&nbsp;				
+
+
+
+&nbsp;		Mode armée actif
+
+&nbsp;		
+
+&nbsp;		si mode 1 validé : 
+
+&nbsp;			bip toute les 2 sec 
+
+&nbsp;			des que detection : 
+
+&nbsp;				bip ultra rapide demi seconde pendant 5 sec puis explosion 
+
+
+
+&nbsp;		si mode 2 validé :
+
+&nbsp;			bip toutes les 2 sec puis accelere 10 sec avant la fin
+
+&nbsp;			des que dectection : ouverture trap :
+
+&nbsp;				Interface desarmenent allume 
+
+&nbsp;				si 1 min plus passer sans interaction fermeture trap 
+
+&nbsp;				
+
+&nbsp;				else : 
+
+&nbsp;					ecran affiche "taper code"
+
+&nbsp;					utilisateur tap code 
+
+&nbsp;					des que appuie sur BpConfirm --> si code bon shutown : bomb defused 
+
+&nbsp;									 else : -1 min **si Trestant < 1 min --> explosion** 
+
+
+
+
+
+
+
+**LISTE PIECE** : 
+
+
+
+
+
+&nbsp;- Arduino Uno R3
+
+&nbsp;- Carte d'extension (4 entrée analogue, 4 entrée I2C, 1 entrée UART, 7 entrée digital) 
+
+&nbsp;- detecteur presence : ultrasonic distance sensor V2.0
+
+&nbsp;- servo 
+
+&nbsp;- bouton BpArm
+
+&nbsp;- Switch commut : switch (P)V1.0
+
+&nbsp;- bouton Bp Confirm 
+
+&nbsp;- Affciheur LCD : grove -16\*2 LCD (White on Blue V2.0)
+
+&nbsp;- Afficher temps : 0,54" redquad alphanumeric display v1.0
+
+&nbsp;- Clavier numerique : 12-Channel capacitive touch keypad (Attiny1616V1.0)
+
+&nbsp;- buzzer 
+
+&nbsp;- RTC time 
+
+
+
+&nbsp;
+
+&nbsp;			
+
+&nbsp;		
+
+&nbsp;				
+
+&nbsp;					
+
+
+
+&nbsp;			
+
