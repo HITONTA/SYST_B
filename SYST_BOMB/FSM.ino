@@ -17,10 +17,11 @@ public:
     MachineEtat();          // Constructeur
     void init();            // Setup interne
     void update();          // À appeler dans loop()
-
-private:
     State currentState;
     unsigned long lastStateChange;
+
+private:
+    
     
     // Méthodes privées pour chaque état
     void handleVeille();

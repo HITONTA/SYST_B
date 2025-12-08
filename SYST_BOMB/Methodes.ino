@@ -1,5 +1,5 @@
 MachineEtat::MachineEtat() {
-    currentState = State::IDLE;
+    currentState = State::VEILLE;
     lastStateChange = 0;
 }
 
