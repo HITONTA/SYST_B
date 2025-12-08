@@ -11,3 +11,10 @@ enum class State{
   BOOM
   DESARM
 };
+
+class MachineEtat {
+public:
+    MachineEtat();          // Constructeur
+    void init();            // Setup interne
+    void update();          // À appeler dans loop()
+};
