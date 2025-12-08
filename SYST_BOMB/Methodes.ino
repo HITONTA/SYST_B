@@ -30,3 +30,8 @@ bool ButtonBPConf() {
   lastStateCONF = currentStateCONF;
   return false;   // bouton non pressé
 }
+
+void MachineEtat::init
+
+
+

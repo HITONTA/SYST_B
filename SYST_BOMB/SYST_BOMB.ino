@@ -53,6 +53,9 @@ Keypad customKeypad = Keypad( makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS
 SR04 sr04 = SR04(ECHO_PIN,TRIG_PIN); // detecteur distance
 long a; // detecteur distance capteur
 
+unsigned long entryTimePREPA_GEN = 0; // Pour RTC
+const unsigned long maxSecondsPREPA_GEN = 10; // durée max autorisée
+unsigned long currentTime = dt.hour * 3600UL + dt.minute * 60UL + dt.second;
 
 
 void setup() {
