@@ -17,4 +17,19 @@ public:
     MachineEtat();          // Constructeur
     void init();            // Setup interne
     void update();          // À appeler dans loop()
+
+private:
+    State currentState;
+    unsigned long lastStateChange;
+    
+    // Méthodes privées pour chaque état
+    void handleVeille();
+    void handlePrepaGen();
+    void handlePrepaAct();
+    void handlePrepaModeAuto();
+    void handlePrepaModeRetard();
+    void handleArmAuto();
+    void handleArmRetard();
+    void handleBoom();
+    void handleDesarm();
 };
