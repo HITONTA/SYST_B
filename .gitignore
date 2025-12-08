@@ -1,0 +1,6 @@
+# .gitignore
+.DS_Store
+*.hex
+*.elf
+*.bin
+/build/
