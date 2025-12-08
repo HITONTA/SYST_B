@@ -24,7 +24,12 @@
 #define TRIG_PIN 9 // detecteur distance
 #define ECHO_PIN 8 // detecteur distance
 
+#define SEUIL 50 // distance de detection pour capteur
 
+bool lastStateARM = HIGH;  // état précédent BOUTON BPARm
+bool currentStateARM;
+bool lastStateCONF = HIGH;  // état précédent BOUTON BpConfirm
+bool currentStateCONF;
 
 Servo myservo; // Pour servo 
 
@@ -36,19 +41,42 @@ const byte COLS = 4; //four columns
 
 byte rowPins[ROWS] = {22, 24, 26, 28}; //connect to the row pinouts of the keypad
 byte colPins[COLS] = {30, 32, 34, 36}; //connect to the column pinouts of the keypad
+char hexaKeys[ROWS][COLS] = {
+  {'1','2','3','A'},
+  {'4','5','6','B'},
+  {'7','8','9','C'},
+  {'*','0','#','D'}
+};
+
 Keypad customKeypad = Keypad( makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS); 
 
 SR04 sr04 = SR04(ECHO_PIN,TRIG_PIN); // detecteur distance
-long a; // detecteur distance
+long a; // detecteur distance capteur
 
 
 
 void setup() {
-  // put your
+  Serial.begin(9600);
+  pinMode(Bp_Arm, INPUT_PULLUP);
+  pinMode(Bp_Confirm, INPUT_PULLUP);
+  Serial.println("lets go");
 
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+
+  detection();
+  if (a > 15){
+    Serial.println("YES");
+  }
+
+  if (ButtonBPArm()) {
+    Serial.println("YESSSSS BOYSSSSS");
+  }
+
+  if (ButtonBPConf()) {
+    Serial.println("YESSSSS CONNNFFF");
+  }
+
 
 }
