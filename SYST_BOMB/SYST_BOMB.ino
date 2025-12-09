@@ -58,6 +58,7 @@ const unsigned long maxSecondsPREPA_GEN = 10; // durée max autorisée
 unsigned long currentTime = dt.hour * 3600UL + dt.minute * 60UL + dt.second;
 
 
+
 void setup() {
   Serial.begin(9600);
   pinMode(Bp_Arm, INPUT_PULLUP);

@@ -3,6 +3,8 @@ MachineEtat::MachineEtat() {
     lastStateChange = 0;
 }
 
+MachineEtat machine;
+
 void detection() {
   a=sr04.Distance();
 }
@@ -36,7 +38,7 @@ bool ButtonBPConf() {
   return false;   // bouton non pressé
 }
 
-void updateFSM() {
+void MachineEtat::update() {
   // Lecture temps RTC
   dt = clock.getDateTime();
   unsigned long currentTime = dt.hour * 3600UL + dt.minute * 60UL + dt.second;
