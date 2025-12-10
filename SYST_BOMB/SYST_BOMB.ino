@@ -13,15 +13,15 @@
 
 #include <Servo.h> // Pour servo pin 10
 
-#define ledPin 6 
+#define ledPin 40 
 
 #define CLK 13 // ecran 4 chiffre
 #define DIO 12 // ecran 4 chiffre
 
-#define Bp_Arm 2 // def bouton arm 
-#define Bp_Confirm 3 // def bouton confirm
-#define Bp_Auto 404 // def bouton sélection auto (pin à déterminer)
-#define Bp_Retard 707 // def bouton sélection retard (pin à déterminer)
+#define Bp_Arm 48 // def bouton arm -- FIL ORANGE
+#define Bp_Confirm 46 // def bouton confirm 66 FIL BLANC
+#define Bp_Auto 42 // def bouton sélection auto 
+#define Bp_Retard 44 // def bouton sélection retard 66 FIL JAUNE
 
 #define TRIG_PIN 9 // detecteur distance
 #define ECHO_PIN 8 // detecteur distance
