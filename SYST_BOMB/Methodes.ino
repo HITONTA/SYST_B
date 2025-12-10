@@ -80,6 +80,7 @@ void MachineEtat::handleVEILLE(){
     entryTimePREPA_GEN = currentTime; // mémoriser le temps d'entrée
     Serial.println("Entrée PREPA_GEN !");
     }
+  
 }
 
 
@@ -97,7 +98,7 @@ void MachineEtat::handlePREPA_GEN(){
   if (ButtonBPArm()) {
     currentState = State::PREPA_ACT;
     Serial.println("Bouton CONF pressé -> PREPA_ACT");
-    //Allumage système (indication écran
+    //Allumage système (indication écran)
   }
 }
 
@@ -111,16 +112,22 @@ void MachineEtat::handlePREPA_ACT(){
   if (ButtonBPAuto()) {
     currentState = State::PREPA_MODE_AUTO;
     Serial.println("Bouton Auto pressé -> PREPA_MODE_AUTO");
+    //affichage texte
   }
   if (ButtonBPRetard()) {
     currentState = State::PREPA_MODE_RETARD;
     Serial.println("Bouton Retard pressé -> PREPA_MODE_RETARD");
+    //affichage texte
   }
 }
 
 
 void MachineEtat::handlePREPA_MODE_AUTO(){
-  
+  if (ButtonBPConf()) {
+    currentState = State::ARM_AUTO;
+    Serial.println("Bouton CONF pressé -> ARM_AUTO");
+    //Allumage système (indication écran, timer avant armement)
+  }
 }
 
 
@@ -130,7 +137,8 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
 
 
 void MachineEtat::handleARM_AUTO(){
-  
+  //led,buzzer
+  //if detect -> state::boom
 }
 
 
@@ -140,12 +148,15 @@ void MachineEtat::handleARM_RETARD(){
 
 
 void MachineEtat::handleBOOM(){
-  
+  //buzzer rapide, timer 10 sec, led, boom
+  //fin après 10sec
+  //standby 5sec puis retour prepa_gen
 }
 
 
 void MachineEtat::handleDESARM(){
-  
+  //buzzer victoire, led
+  //tandby 5sec puis retour prepa_gen
 }
 
 
