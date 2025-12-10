@@ -74,18 +74,7 @@ void setup() {
 
 void loop() {
 
-  detection();
-  if (a > 15){
-    Serial.println("YES");
-  }
-
-  if (ButtonBPArm()) {
-    Serial.println("YESSSSS BOYSSSSS");
-  }
-
-  if (ButtonBPConf()) {
-    Serial.println("YESSSSS CONNNFFF");
-  }
+  machine.update();
 
 
 }

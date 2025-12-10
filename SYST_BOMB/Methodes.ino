@@ -75,7 +75,6 @@ void MachineEtat::handlePREPA_ACT(){
     Serial.println("Bouton CONF pressé -> PREPA_ACT");
     //Extinction système
   }
-  if ()
 }
 
 
@@ -109,7 +108,7 @@ void MachineEtat::handleDESARM(){
 }
 
 
-// Mise à jour des états
+// Mise à jour des états -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 void MachineEtat::update() {
   // Lecture temps RTC
