@@ -57,7 +57,6 @@ long a; // detecteur distance capteur
 
 unsigned long entryTimePREPA_GEN = 0; // Pour RTC
 const unsigned long maxSecondsPREPA_GEN = 10; // durée max autorisée
-unsigned long currentTime = dt.hour * 3600UL + dt.minute * 60UL + dt.second;
 
 
 

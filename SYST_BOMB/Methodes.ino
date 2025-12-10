@@ -113,7 +113,7 @@ void MachineEtat::handleDESARM(){
 void MachineEtat::update() {
   // Lecture temps RTC
   dt = clock.getDateTime();
-  unsigned long currentTime = dt.hour * 3600UL + dt.minute * 60UL + dt.second;
+  currentTime = dt.hour * 3600UL + dt.minute * 60UL + dt.second;
 
   switch (currentState) {
 

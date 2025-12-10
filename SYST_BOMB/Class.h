@@ -19,6 +19,7 @@ public:
     void update();          // À appeler dans loop()
     State currentState;
     unsigned long lastStateChange;
+    unsigned long currentTime;
 
 private:
     
@@ -40,6 +41,7 @@ private:
 MachineEtat::MachineEtat() {
     currentState = State::VEILLE;
     lastStateChange = 0;
+    currentTime = 0;
 }
 
 MachineEtat machine;
