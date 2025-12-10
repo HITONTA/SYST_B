@@ -1,5 +1,5 @@
 //On importe les librairies nécessaires --------------------------------------------------------------------------------------------------------------------------------------------------
-
+#include "Class.h"
 #include <TM1637Display.h>
 
 #include "SR04.h" // detecteur distance
@@ -73,7 +73,7 @@ void setup() {
 }
 
 void loop() {
-
+  
   machine.update();
 
 
