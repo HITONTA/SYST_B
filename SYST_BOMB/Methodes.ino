@@ -1,14 +1,4 @@
-MachineEtat::MachineEtat() {
-    currentState = State::VEILLE;
-    lastStateChange = 0;
-}
-
-MachineEtat machine;
-
-void detection() {
-  a=sr04.Distance();
-}
-
+// Définition des variables --------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 bool ButtonBPArm() {
   int currentStateARM = digitalRead(Bp_Arm);
@@ -38,6 +28,15 @@ bool ButtonBPConf() {
   return false;   // bouton non pressé
 }
 
+
+// Définition des fonctions ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+void detection() {
+  a=sr04.Distance();
+}
+
+
 void MachineEtat::update() {
   // Lecture temps RTC
   dt = clock.getDateTime();
@@ -45,29 +44,29 @@ void MachineEtat::update() {
 
   switch (currentState) {
 
-    case VEILLE:
+    case State::VEILLE:
       detection();
       if (a < 15) { // ATTENTION SENS < INVERSER POUR TEST
-        currentState = PREPA_GEN;
+        currentState = State::PREPA_GEN;
         entryTimePREPA_GEN = currentTime; // mémoriser le temps d'entrée
         Serial.println("Entrée PREPA_GEN !");
       }
       break; // très important pour éviter le fall-through
 
-    case PREPA_GEN:
+    case State::PREPA_GEN:
       detection();
 
       // Vérification du temps
       if ((currentTime - entryTimePREPA_GEN) >= maxSecondsPREPA_GEN) {
         Serial.println("Temps dépassé PREPA_GEN -> retour VEILLE !");
-        currentState = VEILLE;
+        currentState = State::VEILLE;
         // ici tu peux désactiver servo, LED, buzzer
         break;
       }
 
       // Vérification bouton CONF pour passer à l'état suivant
       if (ButtonBPConf()) {
-        currentState = PREPA_ACT;
+        currentState = State::PREPA_ACT;
         Serial.println("Bouton CONF pressé -> PREPA_ACT");
         break;
       }

@@ -1,4 +1,4 @@
-// Fonctionnement de la machine à état
+// Établissement des classes
 
 enum class State {
   VEILLE,
@@ -34,3 +34,12 @@ private:
     void handleBoom();
     void handleDesarm();
 };
+
+
+
+MachineEtat::MachineEtat() {
+    currentState = State::VEILLE;
+    lastStateChange = 0;
+}
+
+MachineEtat machine;

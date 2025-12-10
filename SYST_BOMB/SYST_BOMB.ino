@@ -1,4 +1,4 @@
-//On importe les librairies nécessaires
+//On importe les librairies nécessaires --------------------------------------------------------------------------------------------------------------------------------------------------
 
 #include <TM1637Display.h>
 
@@ -25,6 +25,8 @@
 #define ECHO_PIN 8 // detecteur distance
 
 #define SEUIL 50 // distance de detection pour capteur
+
+// Introduction des variables ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 bool lastStateARM = HIGH;  // état précédent BOUTON BPARm
 bool currentStateARM;
@@ -57,6 +59,9 @@ unsigned long entryTimePREPA_GEN = 0; // Pour RTC
 const unsigned long maxSecondsPREPA_GEN = 10; // durée max autorisée
 unsigned long currentTime = dt.hour * 3600UL + dt.minute * 60UL + dt.second;
 
+
+
+// Corps de code ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 void setup() {
