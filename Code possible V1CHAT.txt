@@ -1,0 +1,244 @@
+/* ==========================================================
+    MACHINE À ÉTATS FINIS (FSM) - VERSION COMPILABLE
+    Toutes les fonctions hardware sont des stubs "dummy"
+    pour garantir la compilation sans erreurs.
+   ========================================================== */
+
+enum State {
+  INIT,
+  VEILLE,
+  PREPA_GENERAL,
+  BOX_ACTIVE,
+  CHOIX_MODE,
+  PREPA_MODE,
+  MODE1_FINAL_CONFIRM,
+  MODE1_ARMED,
+  MODE2_SET_TIME,
+  MODE2_SET_PIN,
+  MODE2_FINAL_CONFIRM,
+  MODE2_ARMED,
+  MODE2_DISARM_INTERFACE,
+  EXPLOSION,
+  DEFUSED
+};
+
+State state = INIT;
+
+// ======================
+// Fonctions d'entrée (simples stubs)
+// ======================
+bool bpArmPressed() { return false; }
+bool bpConfirmPressed() { return false; }
+bool detectionActive() { return false; }
+bool commutMode() { return false; }
+String getKeypadInput() { return ""; }
+
+// ======================
+// Fonctions hardware (stub)
+// ======================
+void openTrap() { Serial.println("[TRAP] OUVERTURE"); }
+void closeTrap() { Serial.println("[TRAP] FERMETURE"); }
+void powerBox(bool on) { Serial.println(on ? "[BOX] ON" : "[BOX] OFF"); }
+void beepNormal() { Serial.println("BIP"); }
+void beepRapid() { Serial.println("BIP RAPIDE"); }
+void displayMessage(const char* msg) { Serial.print("[LCD] "); Serial.println(msg); }
+void showClock(int secRemaining) { 
+  Serial.print("[CLOCK] "); 
+  Serial.println(secRemaining); 
+}
+
+// ======================
+// Variables internes
+// ======================
+unsigned long timerStart = 0;
+int modeChoice = 0;
+bool modeLocked = false;
+
+int mode2TimeTotal = 0;
+int mode2TimeRemaining = 0;
+String mode2PIN = "";
+String enteredDisarmCode = "";
+
+// =======================================================
+//                     FSM UPDATE
+// =======================================================
+void updateFSM() {
+
+  switch (state) {
+
+    case INIT:
+      closeTrap();
+      powerBox(false);
+      state = VEILLE;
+      break;
+
+    case VEILLE:
+      if (detectionActive()) {
+        openTrap();
+        timerStart = millis();
+        state = PREPA_GENERAL;
+      }
+      break;
+
+    case PREPA_GENERAL:
+      if (millis() - timerStart > 60000) {
+        closeTrap();
+        state = VEILLE;
+      }
+      if (bpArmPressed()) {
+        powerBox(true);
+        state = BOX_ACTIVE;
+      }
+      break;
+
+    case BOX_ACTIVE:
+      modeLocked = false;
+      state = CHOIX_MODE;
+      break;
+
+    case CHOIX_MODE:
+      modeChoice = commutMode() ? 2 : 1;
+
+      if (bpArmPressed()) {
+        powerBox(false);
+        state = PREPA_GENERAL;
+        timerStart = millis();
+      }
+
+      if (bpConfirmPressed()) {
+        modeLocked = true;
+        state = PREPA_MODE;
+      }
+      break;
+
+    case PREPA_MODE:
+      if (modeChoice == 1) {
+        state = MODE1_FINAL_CONFIRM;
+      } else {
+        displayMessage("Selection temps (MMSS)");
+        state = MODE2_SET_TIME;
+      }
+      break;
+
+    case MODE1_FINAL_CONFIRM:
+      if (bpConfirmPressed()) {
+        closeTrap();
+        timerStart = millis();
+        state = MODE1_ARMED;
+      }
+      break;
+
+    case MODE1_ARMED:
+      if (millis() - timerStart > 2000) {
+        beepNormal();
+        timerStart = millis();
+      }
+      if (detectionActive()) {
+        unsigned long rapidStart = millis();
+        while (millis() - rapidStart < 5000) {
+          beepRapid();
+          delay(500);
+        }
+        state = EXPLOSION;
+      }
+      break;
+
+    case MODE2_SET_TIME: {
+      String input = getKeypadInput();
+      if (input.length() >= 4) {
+        int mm = (input[0] - '0') * 10 + (input[1] - '0');
+        int ss = (input[2] - '0') * 10 + (input[3] - '0');
+        mode2TimeTotal = mm * 60 + ss;
+        mode2TimeRemaining = mode2TimeTotal;
+      }
+      if (bpConfirmPressed() && mode2TimeTotal > 0) {
+        displayMessage("Choisir code PIN");
+        state = MODE2_SET_PIN;
+      }
+    }
+    break;
+
+    case MODE2_SET_PIN:
+      mode2PIN = getKeypadInput();
+      if (bpConfirmPressed() && mode2PIN.length() > 0) {
+        displayMessage("T'es sur mec ?");
+        state = MODE2_FINAL_CONFIRM;
+      }
+      break;
+
+    case MODE2_FINAL_CONFIRM:
+      if (bpConfirmPressed()) {
+        closeTrap();
+        timerStart = millis();
+        state = MODE2_ARMED;
+      }
+      break;
+
+    case MODE2_ARMED:
+      mode2TimeRemaining = mode2TimeTotal - (millis() - timerStart) / 1000;
+      showClock(mode2TimeRemaining);
+
+      if (mode2TimeRemaining <= 10)
+        beepRapid();
+      else
+        beepNormal();
+
+      if (mode2TimeRemaining <= 0)
+        state = EXPLOSION;
+
+      if (detectionActive()) {
+        openTrap();
+        timerStart = millis();
+        state = MODE2_DISARM_INTERFACE;
+      }
+      break;
+
+    case MODE2_DISARM_INTERFACE:
+      if (millis() - timerStart > 60000) {
+        closeTrap();
+        state = MODE2_ARMED;
+      }
+
+      displayMessage("Taper code :");
+      enteredDisarmCode = getKeypadInput();
+
+      if (bpConfirmPressed() && enteredDisarmCode.length() > 0) {
+        if (enteredDisarmCode == mode2PIN)
+          state = DEFUSED;
+        else {
+          mode2TimeRemaining -= 60;
+          if (mode2TimeRemaining < 60)
+            state = EXPLOSION;
+        }
+      }
+      break;
+
+    case EXPLOSION:
+      displayMessage("EXPLOSION");
+      break;
+
+    case DEFUSED:
+      displayMessage("Bomb defused");
+      powerBox(false);
+      break;
+  }
+}
+
+// =======================================================
+//                     SETUP & LOOP
+// =======================================================
+void setup() {
+  Serial.begin(9600);
+  Serial.println("FSM Started");
+}
+
+void loop() {
+  updateFSM();
+  if (state != MODE1_ARMED && state != MODE2_ARMED) {
+  	if (bpArmPressed()) {
+    		resetToPrepaGeneral();
+    		return;
+  			}
+             }
+}
+
