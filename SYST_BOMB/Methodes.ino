@@ -42,7 +42,7 @@ void detection() {
 
 void MachineEtat::handleVEILLE(){
   detection();
-  if (a < 15) { // ATTENTION SENS < INVERSER POUR TEST
+  if (a < 15) {
     currentState = State::PREPA_GEN;
     entryTimePREPA_GEN = currentTime; // mémoriser le temps d'entrée
     Serial.println("Entrée PREPA_GEN !");
@@ -58,20 +58,24 @@ void MachineEtat::handlePREPA_GEN(){
     Serial.println("Temps dépassé PREPA_GEN -> retour VEILLE !");
     currentState = State::VEILLE;
     // ici tu peux désactiver servo, LED, buzzer
-    break;
   }
 
-  // Vérification bouton CONF pour passer à l'état suivant
-  if (ButtonBPConf()) {
+  // Vérification bouton ARM pour passer à l'état suivant
+  if (ButtonBPArm()) {
     currentState = State::PREPA_ACT;
     Serial.println("Bouton CONF pressé -> PREPA_ACT");
-    break;
+    //Allumage système
   }
 }
 
 
 void MachineEtat::handlePREPA_ACT(){
-  
+  if (ButtonBPArm()) {
+    currentState = State::PREPA_GEN; // ATTENTION !!!!!!! VERIF NON ENCHAINEMENT VALIDATION CONDITION BPArm
+    Serial.println("Bouton CONF pressé -> PREPA_ACT");
+    //Extinction système
+  }
+  if ()
 }
 
 
