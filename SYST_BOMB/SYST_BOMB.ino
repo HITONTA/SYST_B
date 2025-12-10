@@ -73,6 +73,8 @@ void setup() {
   Serial.begin(9600);
   pinMode(Bp_Arm, INPUT_PULLUP);
   pinMode(Bp_Confirm, INPUT_PULLUP);
+  pinMode(Bp_Auto, INPUT_PULLUP);
+  pinMode(Bp_Retard, INPUT_PULLUP);
   Serial.println("lets go");
 
 }
