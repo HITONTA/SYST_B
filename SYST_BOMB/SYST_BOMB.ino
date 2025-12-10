@@ -20,6 +20,8 @@
 
 #define Bp_Arm 2 // def bouton arm 
 #define Bp_Confirm 3 // def bouton confirm
+#define Bp_Auto 404 // def bouton sélection auto (pin à déterminer)
+#define Bp_Retard 707 // def bouton sélection retard (pin à déterminer)
 
 #define TRIG_PIN 9 // detecteur distance
 #define ECHO_PIN 8 // detecteur distance
@@ -32,6 +34,10 @@ bool lastStateARM = HIGH;  // état précédent BOUTON BPARm
 bool currentStateARM;
 bool lastStateCONF = HIGH;  // état précédent BOUTON BpConfirm
 bool currentStateCONF;
+bool lastStateAuto = HIGH;  // état précédent BOUTON BpAuto
+bool currentStateAuto;
+bool lastStateRetard = HIGH;  // état précédent BOUTON BpRetard
+bool currentStateRetard;
 
 Servo myservo; // Pour servo 
 

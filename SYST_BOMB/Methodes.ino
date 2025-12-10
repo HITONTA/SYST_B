@@ -14,6 +14,8 @@ bool ButtonBPArm() {
   return false;   // bouton non pressé
 }
 
+
+
 bool ButtonBPConf() {
   int currentStateCONF = digitalRead(Bp_Confirm);
 
@@ -28,6 +30,37 @@ bool ButtonBPConf() {
   return false;   // bouton non pressé
 }
 
+
+
+bool ButtonBPAuto() {
+  int currentStateAuto = digitalRead(Bp_Auto);
+
+  // FRONT MONTANT (pression) : on détecte HIGH -> LOW
+  if (lastStateAuto == HIGH && currentStateAuto == LOW) {
+    Serial.println("Front detecté Auto!");
+    lastStateAuto = currentStateAuto;
+    return true;  // bouton pressé
+  }
+
+  lastStateAuto = currentStateAuto;
+  return false;   // bouton non pressé
+}
+
+
+
+bool ButtonBPRetard() {
+  int currentStateRetard = digitalRead(Bp_Retard);
+
+  // FRONT MONTANT (pression) : on détecte HIGH -> LOW
+  if (lastStateRetard == HIGH && currentStateRetard == LOW) {
+    Serial.println("Front detecté Retard!");
+    lastStateRetard = currentStateRetard;
+    return true;  // bouton pressé
+  }
+
+  lastStateRetard = currentStateRetard;
+  return false;   // bouton non pressé
+}
 
 // Définition des fonctions ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -64,7 +97,7 @@ void MachineEtat::handlePREPA_GEN(){
   if (ButtonBPArm()) {
     currentState = State::PREPA_ACT;
     Serial.println("Bouton CONF pressé -> PREPA_ACT");
-    //Allumage système
+    //Allumage système (indication écran
   }
 }
 
@@ -72,8 +105,16 @@ void MachineEtat::handlePREPA_GEN(){
 void MachineEtat::handlePREPA_ACT(){
   if (ButtonBPArm()) {
     currentState = State::PREPA_GEN; // ATTENTION !!!!!!! VERIF NON ENCHAINEMENT VALIDATION CONDITION BPArm
-    Serial.println("Bouton CONF pressé -> PREPA_ACT");
+    Serial.println("Bouton CONF pressé -> PREPA_GEN");
     //Extinction système
+  }
+  if (ButtonBPAuto()) {
+    currentState = State::PREPA_MODE_AUTO;
+    Serial.println("Bouton Auto pressé -> PREPA_MODE_AUTO");
+  }
+  if (ButtonBPRetard()) {
+    currentState = State::PREPA_MODE_RETARD;
+    Serial.println("Bouton Retard pressé -> PREPA_MODE_RETARD");
   }
 }
 
