@@ -31,11 +31,81 @@ bool ButtonBPConf() {
 
 // Définition des fonctions ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+// Récupération distance
 
 void detection() {
   a=sr04.Distance();
 }
 
+
+//Gestion des états
+
+void MachineEtat::handleVEILLE(){
+  detection();
+  if (a < 15) { // ATTENTION SENS < INVERSER POUR TEST
+    currentState = State::PREPA_GEN;
+    entryTimePREPA_GEN = currentTime; // mémoriser le temps d'entrée
+    Serial.println("Entrée PREPA_GEN !");
+    }
+}
+
+
+void MachineEtat::handlePREPA_GEN(){
+  detection();
+
+  // Vérification du temps
+  if ((currentTime - entryTimePREPA_GEN) >= maxSecondsPREPA_GEN) {
+    Serial.println("Temps dépassé PREPA_GEN -> retour VEILLE !");
+    currentState = State::VEILLE;
+    // ici tu peux désactiver servo, LED, buzzer
+    break;
+  }
+
+  // Vérification bouton CONF pour passer à l'état suivant
+  if (ButtonBPConf()) {
+    currentState = State::PREPA_ACT;
+    Serial.println("Bouton CONF pressé -> PREPA_ACT");
+    break;
+  }
+}
+
+
+void MachineEtat::handlePREPA_ACT(){
+  
+}
+
+
+void MachineEtat::handlePREPA_MODE_AUTO(){
+  
+}
+
+
+void MachineEtat::handlePREPA_MODE_RETARD(){
+  
+}
+
+
+void MachineEtat::handleARM_AUTO(){
+  
+}
+
+
+void MachineEtat::handleARM_RETARD(){
+  
+}
+
+
+void MachineEtat::handleBOOM(){
+  
+}
+
+
+void MachineEtat::handleDESARM(){
+  
+}
+
+
+// Mise à jour des états
 
 void MachineEtat::update() {
   // Lecture temps RTC
@@ -45,34 +115,39 @@ void MachineEtat::update() {
   switch (currentState) {
 
     case State::VEILLE:
-      detection();
-      if (a < 15) { // ATTENTION SENS < INVERSER POUR TEST
-        currentState = State::PREPA_GEN;
-        entryTimePREPA_GEN = currentTime; // mémoriser le temps d'entrée
-        Serial.println("Entrée PREPA_GEN !");
-      }
+      MachineEtat::handleVEILLE ();
       break; // très important pour éviter le fall-through
-
+      
     case State::PREPA_GEN:
-      detection();
-
-      // Vérification du temps
-      if ((currentTime - entryTimePREPA_GEN) >= maxSecondsPREPA_GEN) {
-        Serial.println("Temps dépassé PREPA_GEN -> retour VEILLE !");
-        currentState = State::VEILLE;
-        // ici tu peux désactiver servo, LED, buzzer
-        break;
-      }
-
-      // Vérification bouton CONF pour passer à l'état suivant
-      if (ButtonBPConf()) {
-        currentState = State::PREPA_ACT;
-        Serial.println("Bouton CONF pressé -> PREPA_ACT");
-        break;
-      }
-
+      MachineEtat::handlePREPA_GEN ();
       break;
 
-    // Tu peux ajouter les autres états ici...
+    case State::PREPA_ACT:
+      handlePREPA_ACT();
+      break;
+
+    case State::PREPA_MODE_AUTO:
+      handlePREPA_MODE_AUTO();
+      break;
+
+    case State::PREPA_MODE_RETARD:
+      handlePREPA_MODE_RETARD();
+      break;
+
+    case State::ARM_AUTO:
+      handleARM_AUTO();
+      break;
+
+    case State::ARM_RETARD:
+      handleARM_RETARD();
+      break;
+
+    case State::BOOM:
+      handleBOOM();
+      break;
+
+    case State::DESARM:
+      handleDESARM();
+      break;
   }
 }

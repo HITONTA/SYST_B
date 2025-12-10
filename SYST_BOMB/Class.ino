@@ -1,4 +1,4 @@
-// Établissement des classes
+// Établissement des classes --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 enum class State {
   VEILLE,
@@ -24,18 +24,18 @@ private:
     
     
     // Méthodes privées pour chaque état
-    void handleVeille();
-    void handlePrepaGen();
-    void handlePrepaAct();
-    void handlePrepaModeAuto();
-    void handlePrepaModeRetard();
-    void handleArmAuto();
-    void handleArmRetard();
-    void handleBoom();
-    void handleDesarm();
+    void handleVEILLE();
+    void handlePREPA_GEN();
+    void handlePREPA_ACT();
+    void handlePREPA_MODE_AUTO();
+    void handlePREPA_MODE_RETARD();
+    void handleARM_AUTO();
+    void handleARM_RETARD();
+    void handleBOOM();
+    void handleDESARM();
 };
 
-
+// Construction de la classe ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 MachineEtat::MachineEtat() {
     currentState = State::VEILLE;
