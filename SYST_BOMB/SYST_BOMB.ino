@@ -5,6 +5,7 @@
 #include "SR04.h" // detecteur distance
 
 #include <Wire.h> // pour RTC 
+
 #include <DS3231.h> // Pour RTC
 
 #include <Keypad.h> // pour pad
@@ -13,10 +14,13 @@
 
 #include <Servo.h> // Pour servo pin 10
 
+#include <LiquidCrystal.h>
+
 #define ledPin 40 
 
 #define CLK 13 // ecran 4 chiffre
 #define DIO 12 // ecran 4 chiffre
+TM1637Display display(CLK, DIO);
 
 #define Bp_Arm 48 // def bouton arm -- FIL ORANGE
 #define Bp_Confirm 46 // def bouton confirm 66 FIL BLANC
@@ -27,6 +31,11 @@
 #define ECHO_PIN 8 // detecteur distance
 
 #define SEUIL 50 // distance de detection pour capteur
+
+#define BUZZER_PIN 11
+#define LED_PIN 40
+#define BUZZER_FREQ 2000
+#define BUZZER_SHORT 100
 
 // Introduction des variables ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -40,6 +49,8 @@ bool lastStateRetard = HIGH;  // état précédent BOUTON BpRetard
 bool currentStateRetard;
 
 Servo myservo; // Pour servo 
+
+LiquidCrystal lcd(2,3,4,5,6,7); // RS, EN, D4, D5, D6, D7
 
 DS3231 clock;    // Pour RTC
 RTCDateTime dt;  // Pour RTC
@@ -63,6 +74,15 @@ long a; // detecteur distance capteur
 
 unsigned long entryTimePREPA_GEN = 0; // Pour RTC
 const unsigned long maxSecondsPREPA_GEN = 10; // durée max autorisée
+
+char buffer[4] = {'0','0','0','0'};
+bool countdownStarted = false;
+bool waitingNewInput = false;
+long targetSeconds = 0;
+long lastBeepSecond = -1;
+unsigned long lastBlinkTime = 0;
+bool blinkState = false;
+bool ledState = false;
 
 
 
