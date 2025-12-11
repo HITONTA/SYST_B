@@ -46,6 +46,23 @@ Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS)
 #define BUZZER_SHORT 100
 
 // ---------------------------
+// AJOUT : BOUTONS JOUR
+// ---------------------------
+#define BTN_PLUS 44
+#define BTN_MINUS 42
+#define BTN_VALIDATE 46
+
+int dayOffset = 0;            // <<< AJOUT
+bool selectingDay = true;     // <<< AJOUT
+unsigned long lastButtonCheck = 0; // <<< AJOUT
+const unsigned long debounceTime = 50; // <<< AJOUT
+
+// --- pour front montant
+bool lastStatePlus = HIGH;       // <<< AJOUT
+bool lastStateMinus = HIGH;      // <<< AJOUT
+bool lastStateValidate = HIGH;   // <<< AJOUT
+
+// ---------------------------
 // VARIABLES
 // ---------------------------
 char buffer[4] = {'0','0','0','0'};
@@ -67,15 +84,22 @@ void setup() {
   // --- LCD : affichage initial demandé ---
   lcd.begin(16,2);
   lcd.clear();
+
+  // <<< AJOUT : écran de sélection du jour
   lcd.setCursor(0,0);
-  lcd.print("taper l'HH:MM");
+  lcd.print("Choisir le jour");
   lcd.setCursor(0,1);
-  lcd.print("target");
+  lcd.print("J + 0");
 
   clock.begin();
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(LED_PIN, OUTPUT);
   Serial.println("System Ready");
+
+  // <<< AJOUT : initialisation boutons
+  pinMode(BTN_PLUS, INPUT_PULLUP);
+  pinMode(BTN_MINUS, INPUT_PULLUP);
+  pinMode(BTN_VALIDATE, INPUT_PULLUP);
 }
 
 // ---------------------------
@@ -100,8 +124,53 @@ void displayBuffer() {
 // LOOP
 // ---------------------------
 void loop() {
-  char key = customKeypad.getKey();
   unsigned long currentMillis = millis();
+
+  // --------------------------------------------------------
+  // <<< AJOUT : GESTION SELECTION JOUR AVEC FRONT MONTANT
+  // --------------------------------------------------------
+  if (selectingDay) {
+    bool statePlus = digitalRead(BTN_PLUS);
+    bool stateMinus = digitalRead(BTN_MINUS);
+    bool stateValidate = digitalRead(BTN_VALIDATE);
+
+    if (statePlus == LOW && lastStatePlus == HIGH) { // front montant
+      dayOffset++;
+      lcd.clear();
+      lcd.setCursor(0,0);
+      lcd.print("Choisir le jour");
+      lcd.setCursor(0,1);
+      lcd.print("J + "); lcd.print(dayOffset);
+    }
+    if (stateMinus == LOW && lastStateMinus == HIGH) {
+      if (dayOffset > 0) dayOffset--;
+      lcd.clear();
+      lcd.setCursor(0,0);
+      lcd.print("Choisir le jour");
+      lcd.setCursor(0,1);
+      lcd.print("J + "); lcd.print(dayOffset);
+    }
+    if (stateValidate == LOW && lastStateValidate == HIGH) {
+      selectingDay = false;
+      lcd.clear();
+      lcd.setCursor(0,0);
+      lcd.print("taper l'HH:MM");
+      lcd.setCursor(0,1);
+      lcd.print("target");
+    }
+
+    lastStatePlus = statePlus;
+    lastStateMinus = stateMinus;
+    lastStateValidate = stateValidate;
+
+    return; // empêche d’aller plus loin tant que pas validé
+  }
+
+  // --------------------------------------------------------
+  // TON CODE ORIGINAL REPREND ICI (INTACT)
+  // --------------------------------------------------------
+
+  char key = customKeypad.getKey();
 
   // --- GESTION SAISIE ---
   if (!countdownStarted && !waitingNewInput && key) {
@@ -121,12 +190,14 @@ void loop() {
       int hh = (buffer[0]-'0')*10 + (buffer[1]-'0');
       int mm = (buffer[2]-'0')*10 + (buffer[3]-'0');
       targetSeconds = convertToSeconds(hh, mm, 0);
-      
+
       dt = clock.getDateTime();
       long nowSeconds = convertToSeconds(dt.hour, dt.minute, dt.second);
 
+      // <<< AJOUT : appliquer le décalage J+N
+      targetSeconds += (long)dayOffset * 86400L;
+
       if (targetSeconds <= nowSeconds) {
-        // --- AJOUT LCD : erreur si target déjà passé ---
         waitingNewInput = true;
         lcd.clear();
         lcd.setCursor(0,0);
@@ -139,7 +210,6 @@ void loop() {
         countdownStarted = true;
         lastBeepSecond = -1;
 
-        // --- AJOUT LCD : confirmation démarrage chrono ---
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("Valider, compte");
@@ -152,7 +222,7 @@ void loop() {
     }
   }
 
-  // --- GESTION CLIGNOTEMENT SI TEMPS PASSE ---
+  // --- GESTION CLIGNOTEMENT ---
   if (waitingNewInput) {
     if (currentMillis - lastBlinkTime >= 500) {
       lastBlinkTime = currentMillis;
@@ -161,7 +231,6 @@ void loop() {
       else display.clear();
     }
 
-    // Nouvelle saisie : remettre message initial sur LCD et reprise saisie TM
     if (key && key >= '0' && key <= '9') {
       waitingNewInput = false;
       buffer[0] = buffer[1] = buffer[2] = buffer[3] = '0';
@@ -183,7 +252,18 @@ void loop() {
     long remaining = targetSeconds - nowSeconds;
     if (remaining < 0) remaining = 0;
 
-    display.showNumberDec(remaining, true);
+    // <<< AJOUT : gestion affichage TM1637 si >9999
+    if (remaining > 9999) {
+      if (currentMillis - lastBlinkTime >= 1000) {
+        lastBlinkTime = currentMillis;
+        blinkState = !blinkState;
+        if (blinkState) display.showNumberDec(9999, true);
+        else display.clear();
+      }
+    } else {
+      display.showNumberDec(remaining, true);
+    }
+
     Serial.print("Remaining seconds: "); Serial.println(remaining);
 
     // --- Gestion Buzzer + LED ---
@@ -217,7 +297,7 @@ void loop() {
       }
     } else if (remaining == 1 && lastBeepSecond != remaining) {
       tone(BUZZER_PIN, BUZZER_FREQ);
-      digitalWrite(LED_PIN, HIGH); // LED allumée pendant la dernière seconde
+      digitalWrite(LED_PIN, HIGH);
       lastBeepSecond = remaining;
     }
 
@@ -232,7 +312,6 @@ void loop() {
       digitalWrite(LED_PIN, LOW);
       countdownStarted = false;
 
-      // Clignotement TM1637 toutes les 500ms pendant 3s
       if (currentMillis - lastBlinkTime >= 500) {
         lastBlinkTime = currentMillis;
         blinkState = !blinkState;
@@ -240,12 +319,10 @@ void loop() {
         else display.clear();
       }
 
-      // Réinitialiser buffer
       buffer[0] = buffer[1] = buffer[2] = buffer[3] = '0';
       displayBuffer();
       Serial.println("Countdown finished, buffer reset.");
 
-      // --- AJOUT LCD : remettre message initial ---
       lcd.clear();
       lcd.setCursor(0,0);
       lcd.print("taper l'HH:MM");
