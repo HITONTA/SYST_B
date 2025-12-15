@@ -73,7 +73,7 @@ SR04 sr04 = SR04(ECHO_PIN,TRIG_PIN); // detecteur distance
 long a; // detecteur distance capteur
 
 unsigned long entryTimePREPA_GEN = 0; // Pour RTC
-const unsigned long maxSecondsPREPA_GEN = 10; // durée max autorisée
+const unsigned long maxSecondsPREPA_GEN = 30; // durée max autorisée
 
 char buffer[4] = {'0','0','0','0'};
 bool countdownStarted = false;
@@ -98,7 +98,9 @@ void setup() {
   pinMode(Bp_Retard, INPUT_PULLUP);
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(LED_PIN, OUTPUT);
-  Serial.println("lets go");
+  myservo.attach(10);
+  myservo.write(0); // move servos to center position -> 0°
+  Serial.println(F("lets go"));
 }
 
 void loop() {

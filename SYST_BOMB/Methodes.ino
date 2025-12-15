@@ -5,7 +5,7 @@ bool ButtonBPArm() {
 
   // FRONT MONTANT (pression) : on détecte HIGH -> LOW
   if (lastStateARM == HIGH && currentStateARM == LOW) {
-    Serial.println("Front detecté ARM!");
+    Serial.println(F("Front detecté ARM!"));
     lastStateARM = currentStateARM;
     return true;  // bouton pressé
   }
@@ -21,7 +21,7 @@ bool ButtonBPConf() {
 
   // FRONT MONTANT (pression) : on détecte HIGH -> LOW
   if (lastStateCONF == HIGH && currentStateCONF == LOW) {
-    Serial.println("Front detecté CONF!");
+    Serial.println(F("Front detecté CONF!"));
     lastStateCONF = currentStateCONF;
     return true;  // bouton pressé
   }
@@ -37,7 +37,7 @@ bool ButtonBPAuto() {
 
   // FRONT MONTANT (pression) : on détecte HIGH -> LOW
   if (lastStateAuto == HIGH && currentStateAuto == LOW) {
-    Serial.println("Front detecté Auto!");
+    Serial.println(F("Front detecté Auto!"));
     lastStateAuto = currentStateAuto;
     return true;  // bouton pressé
   }
@@ -53,7 +53,7 @@ bool ButtonBPRetard() {
 
   // FRONT MONTANT (pression) : on détecte HIGH -> LOW
   if (lastStateRetard == HIGH && currentStateRetard == LOW) {
-    Serial.println("Front detecté Retard!");
+    Serial.println(F("Front detecté Retard!"));
     lastStateRetard = currentStateRetard;
     return true;  // bouton pressé
   }
@@ -79,35 +79,64 @@ void MachineEtat::handleVEILLE(){
   if (a < 15) {
     currentState = State::PREPA_GEN;
     entryTimePREPA_GEN = currentTime; // mémorise le temps d'entrée
-    Serial.println("Entrée PREPA_GEN !");
-    //ouverture trappe
+    Serial.println(F("Entrée PREPA_GEN !"));
+    myservo.write(90); //                                                Vérif si mouvement servo : non bloquant
     display.setBrightness(0x0f); // Luminosité max (0x00 à 0x0f)
     lcd.begin(16,2);
     lcd.clear();
     lcd.setCursor(0,0);
-    lcd.print("Bienvenue ! Pour");
-    lcd.setCursor(0,1);
-    lcd.print("commencer armer");
+    lcd.print(F("Bienvenue|Armer"));
+    //flash led
+    //bip buzzer
     }
   
 }
 
 
-void MachineEtat::handlePREPA_GEN(){
+void MachineEtat::handlePREPA_GEN(){//                       VERIF currentTime est en sec
   detection();
 
   // Vérification du temps
   if ((currentTime - entryTimePREPA_GEN) >= maxSecondsPREPA_GEN) {
-    Serial.println("Temps dépassé PREPA_GEN -> retour VEILLE !");
+    Serial.println(F("Temps dépassé PREPA_GEN -> retour VEILLE !"));
     currentState = State::VEILLE;
-    // ici tu peux désactiver servo, LED, buzzer
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(F("Attention");
+    lcd.setCursor(0,1);
+    lcd.print(F("Fermeture"));
+    //bip buzzer
+    //flash LED
+    myservo.write(0);
+    display.setBrightness(0x00);
+    lcd.clear();
+  
+  } else {
+    // Avertissement fermeture
+    lcd.setCursor(0,1);
+    lcd.print(F("                ")); //effacement ligne 2
+    lcd.print(F("Veille dans "));
+    lcd.setCursor(12,1);
+    lcd.print(maxSecondsPREPA_GEN - (currentTime - entryTimePREPA_GEN));
+    if ((currentTime - entryTimePREPA_GEN) <= maxSecondsPREPA_GEN - 9) {
+      lcd.setCursor(14,1);
+    } else {
+      lcd.setCursor(13,1);
+    }
+    lcd.print(F("s"));
   }
 
   // Vérification bouton ARM pour passer à l'état suivant
   if (ButtonBPArm()) {
     currentState = State::PREPA_ACT;
-    Serial.println("Bouton CONF pressé -> PREPA_ACT");
-    //Allumage système (indication écran)
+    Serial.println(F("Bouton CONF pressé -> PREPA_ACT"));
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(F("Veuillez choisir"));
+    lcd.setCursor(0,1);
+    lcd.print(F("le mode"));
+    //bip buzzer
+    //allumage led
   }
 }
 
@@ -115,17 +144,17 @@ void MachineEtat::handlePREPA_GEN(){
 void MachineEtat::handlePREPA_ACT(){
   if (ButtonBPArm()) {
     currentState = State::PREPA_GEN; // ATTENTION !!!!!!! VERIF NON ENCHAINEMENT VALIDATION CONDITION BPArm
-    Serial.println("Bouton CONF pressé -> PREPA_GEN");
+    Serial.println(F("Bouton CONF pressé -> PREPA_GEN"));
     //Extinction système
   }
   if (ButtonBPAuto()) {
     currentState = State::PREPA_MODE_AUTO;
-    Serial.println("Bouton Auto pressé -> PREPA_MODE_AUTO");
+    Serial.println(F("Bouton Auto pressé -> PREPA_MODE_AUTO"));
     //affichage texte
   }
   if (ButtonBPRetard()) {
     currentState = State::PREPA_MODE_RETARD;
-    Serial.println("Bouton Retard pressé -> PREPA_MODE_RETARD");
+    Serial.println(F("Bouton Retard pressé -> PREPA_MODE_RETARD"));
     //affichage texte
   }
 }
@@ -134,7 +163,7 @@ void MachineEtat::handlePREPA_ACT(){
 void MachineEtat::handlePREPA_MODE_AUTO(){
   if (ButtonBPConf()) {
     currentState = State::ARM_AUTO;
-    Serial.println("Bouton CONF pressé -> ARM_AUTO");
+    Serial.println(F("Bouton CONF pressé -> ARM_AUTO"));
     //Allumage système (indication écran, timer avant armement)
   }
 }
