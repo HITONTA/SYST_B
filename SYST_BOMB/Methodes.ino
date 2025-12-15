@@ -66,15 +66,16 @@ bool ButtonBPRetard() {
 
 // Récupération distance
 
-void detection() {
+int detection() {
   a=sr04.Distance();
+  return a;
 }
 
 
 //Gestion des états
 
 void MachineEtat::handleVEILLE(){
-  detection();
+  a = detection();
   if (a < 15) {
     currentState = State::PREPA_GEN;
     entryTimePREPA_GEN = currentTime; // mémoriser le temps d'entrée

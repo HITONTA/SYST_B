@@ -91,6 +91,7 @@ bool ledState = false;
 
 void setup() {
   Serial.begin(9600);
+  clock.begin();
   pinMode(Bp_Arm, INPUT_PULLUP);
   pinMode(Bp_Confirm, INPUT_PULLUP);
   pinMode(Bp_Auto, INPUT_PULLUP);
