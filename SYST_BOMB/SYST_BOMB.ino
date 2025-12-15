@@ -96,8 +96,9 @@ void setup() {
   pinMode(Bp_Confirm, INPUT_PULLUP);
   pinMode(Bp_Auto, INPUT_PULLUP);
   pinMode(Bp_Retard, INPUT_PULLUP);
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
   Serial.println("lets go");
-
 }
 
 void loop() {

@@ -78,8 +78,16 @@ void MachineEtat::handleVEILLE(){
   a = detection();
   if (a < 15) {
     currentState = State::PREPA_GEN;
-    entryTimePREPA_GEN = currentTime; // mémoriser le temps d'entrée
+    entryTimePREPA_GEN = currentTime; // mémorise le temps d'entrée
     Serial.println("Entrée PREPA_GEN !");
+    //ouverture trappe
+    display.setBrightness(0x0f); // Luminosité max (0x00 à 0x0f)
+    lcd.begin(16,2);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Bienvenue ! Pour");
+    lcd.setCursor(0,1);
+    lcd.print("commencer armer");
     }
   
 }
