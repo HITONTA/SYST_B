@@ -211,7 +211,7 @@ void MachineEtat::handlePREPA_ACT(){
 }
 
 
-void MachineEtat::handlePREPA_MODE_AUTO(){
+void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
   if (ButtonBPArm()) {
     desarm();
   }
@@ -271,8 +271,8 @@ void MachineEtat::update() {
       handlePREPA_ACT();
       break;
 
-    case State::PREPA_MODE_AUTO:
-      handlePREPA_MODE_AUTO();
+    case State::PREPA_MODE_RETARD_CODE:
+      handlePREPA_MODE_RETARD_CODE();
       break;
 
     case State::PREPA_MODE_RETARD:
