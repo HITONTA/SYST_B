@@ -71,6 +71,19 @@ int detection() {
   return a;
 }
 
+// Fonctions annexes
+
+void MachineEtat::desarm() {
+  currentState = State::PREPA_GEN; // ATTENTION !!!!!!! VERIF NON ENCHAINEMENT VALIDATION CONDITION BPArm
+  Serial.println(F("Bouton Arm pressé -> PREPA_GEN"));
+  entryTimePREPA_GEN = currentTime; // mémorise le temps d'entrée
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print(F("Bienvenue|Armer"));
+  digitalWrite(ledPin, HIGH);
+  stateLED = true;
+  tone(11, NOTE_A5, 1000);
+}
 
 //Gestion des états
 
@@ -158,15 +171,7 @@ void MachineEtat::handlePREPA_GEN(){//                       VERIF currentTime e
 
 void MachineEtat::handlePREPA_ACT(){
   if (ButtonBPArm()) {
-    currentState = State::PREPA_GEN; // ATTENTION !!!!!!! VERIF NON ENCHAINEMENT VALIDATION CONDITION BPArm
-    Serial.println(F("Bouton Arm pressé -> PREPA_GEN"));
-    entryTimePREPA_GEN = currentTime; // mémorise le temps d'entrée
-    lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print(F("Bienvenue|Armer"));
-    digitalWrite(ledPin, HIGH);
-    stateLED = true;
-    tone(11, NOTE_A5, 1000);
+    desarm();
   }
   if (ButtonBPAuto()) {
     currentState = State::PREPA_MODE_AUTO;
@@ -182,6 +187,10 @@ void MachineEtat::handlePREPA_ACT(){
 
 
 void MachineEtat::handlePREPA_MODE_AUTO(){
+  if (ButtonBPArm()) {
+    desarm();
+  }
+  
   if (ButtonBPConf()) {
     currentState = State::ARM_AUTO;
     Serial.println(F("Bouton CONF pressé -> ARM_AUTO"));
@@ -191,6 +200,9 @@ void MachineEtat::handlePREPA_MODE_AUTO(){
 
 
 void MachineEtat::handlePREPA_MODE_RETARD(){
+  if (ButtonBPArm()) {
+    desarm();
+  }
   
 }
 

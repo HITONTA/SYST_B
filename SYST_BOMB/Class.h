@@ -34,6 +34,7 @@ private:
     void handleARM_RETARD();
     void handleBOOM();
     void handleDESARM();
+    void desarm();
 };
 
 // Construction de la classe ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
