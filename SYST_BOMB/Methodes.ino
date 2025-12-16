@@ -76,37 +76,52 @@ int detection() {
 
 void MachineEtat::handleVEILLE(){
   a = detection();
+
+  if (stateLED and ((currentTime - entryFlashLED) >= 1)) {
+    digitalWrite(ledPin, LOW);
+    stateLED = false;
+  }
+  
   if (a < 15) {
     currentState = State::PREPA_GEN;
     entryTimePREPA_GEN = currentTime; // mémorise le temps d'entrée
     Serial.println(F("Entrée PREPA_GEN !"));
-    myservo.write(90); //                                                Vérif si mouvement servo : non bloquant
+    myservo.write(90); //                                                Vérif si mouvement servo = non bloquant
     display.setBrightness(0x0f); // Luminosité max (0x00 à 0x0f)
     lcd.begin(16,2);
     lcd.clear();
     lcd.setCursor(0,0);
     lcd.print(F("Bienvenue|Armer"));
-    //flash led
-    //bip buzzer
+    digitalWrite(ledPin, HIGH);
+    stateLED = true;
+    tone(11, NOTE_A5, 1000);
     }
   
 }
 
 
-void MachineEtat::handlePREPA_GEN(){//                       VERIF currentTime est en sec
+void MachineEtat::handlePREPA_GEN(){//                       VERIF currentTime est en secondes
   detection();
 
+  if (stateLED and ((currentTime - entryTimePREPA_GEN) >= 1)) {
+    digitalWrite(ledPin, LOW);
+    stateLED = false;
+  }
+
+  
   // Vérification du temps
   if ((currentTime - entryTimePREPA_GEN) >= maxSecondsPREPA_GEN) {
     Serial.println(F("Temps dépassé PREPA_GEN -> retour VEILLE !"));
     currentState = State::VEILLE;
     lcd.clear();
     lcd.setCursor(0,0);
-    lcd.print(F("Attention");
+    lcd.print(F("Attention"));
     lcd.setCursor(0,1);
     lcd.print(F("Fermeture"));
-    //bip buzzer
-    //flash LED
+    tone(11, NOTE_A5, 500);
+    entryFlashLED = currentTime;
+    digitalWrite(ledPin, HIGH);
+    stateLED = true;
     myservo.write(0);
     display.setBrightness(0x00);
     lcd.clear();
@@ -135,8 +150,8 @@ void MachineEtat::handlePREPA_GEN(){//                       VERIF currentTime e
     lcd.print(F("Veuillez choisir"));
     lcd.setCursor(0,1);
     lcd.print(F("le mode"));
-    //bip buzzer
-    //allumage led
+    tone(11, NOTE_A5, 500);
+    digitalWrite(ledPin, HIGH);
   }
 }
 

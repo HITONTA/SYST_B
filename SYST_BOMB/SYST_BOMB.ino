@@ -73,6 +73,8 @@ SR04 sr04 = SR04(ECHO_PIN,TRIG_PIN); // detecteur distance
 long a; // detecteur distance capteur
 
 unsigned long entryTimePREPA_GEN = 0; // Pour RTC
+unsigned long entryFlashLED = 0;
+bool stateLED = false;
 const unsigned long maxSecondsPREPA_GEN = 30; // durée max autorisée
 
 char buffer[4] = {'0','0','0','0'};
