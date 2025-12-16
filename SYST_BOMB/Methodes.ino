@@ -231,7 +231,12 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
         currentState = State::PREPA_MODE_RETARD;
         Serial.println(F("Code bon"));
         tone(11,NoteB,1000);
-        //prepa phase suivante ///////////////////////////////////////////////////////////////////// ICI
+        IsCode = false;
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print(F("Choisir un jour"));
+        lcd.setCursor(0,1);
+        lcd.print(F("J + 0"));
       } else if (EssaiCode.length() >= 15) {
         tone(11,NotePB,1000);
         Serial.println(F("Code trop long"));
@@ -274,7 +279,7 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
   }
 }
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////// ICI
 void MachineEtat::handlePREPA_MODE_RETARD(){
   if (ButtonBPArm()) {
     desarm();
