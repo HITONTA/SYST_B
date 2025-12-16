@@ -117,7 +117,7 @@ void MachineEtat::handlePREPA_GEN(){//                       VERIF currentTime e
     lcd.setCursor(0,0);
     lcd.print(F("Attention"));
     lcd.setCursor(0,1);
-    lcd.print(F("Fermeture"));
+    lcd.print(F("Fermeture"));//Inutile...
     tone(11, NOTE_A5, 500);
     entryFlashLED = currentTime;
     digitalWrite(ledPin, HIGH);
@@ -159,8 +159,14 @@ void MachineEtat::handlePREPA_GEN(){//                       VERIF currentTime e
 void MachineEtat::handlePREPA_ACT(){
   if (ButtonBPArm()) {
     currentState = State::PREPA_GEN; // ATTENTION !!!!!!! VERIF NON ENCHAINEMENT VALIDATION CONDITION BPArm
-    Serial.println(F("Bouton CONF pressé -> PREPA_GEN"));
-    //Extinction système
+    Serial.println(F("Bouton Arm pressé -> PREPA_GEN"));
+    entryTimePREPA_GEN = currentTime; // mémorise le temps d'entrée
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(F("Bienvenue|Armer"));
+    digitalWrite(ledPin, HIGH);
+    stateLED = true;
+    tone(11, NOTE_A5, 1000);
   }
   if (ButtonBPAuto()) {
     currentState = State::PREPA_MODE_AUTO;
