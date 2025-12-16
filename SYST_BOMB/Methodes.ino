@@ -62,6 +62,9 @@ bool ButtonBPRetard() {
   return false;   // bouton non pressé
 }
 
+unsigned NoteB = NOTE_A5; //Note validation
+unsigned NotePB = NOTE_B5; //Note pas bien
+
 // Définition des fonctions ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 // Récupération distance
@@ -82,7 +85,7 @@ void MachineEtat::desarm() {
   lcd.print(F("Bienvenue|Armer"));
   digitalWrite(ledPin, HIGH);
   stateLED = true;
-  tone(11, NOTE_A5, 1000);
+  tone(11, NoteB, 1000);
 }
 
 //Gestion des états
@@ -107,7 +110,7 @@ void MachineEtat::handleVEILLE(){
     lcd.print(F("Bienvenue|Armer"));
     digitalWrite(ledPin, HIGH);
     stateLED = true;
-    tone(11, NOTE_A5, 1000);
+    tone(11, NoteB, 1000);
     }
   
 }
@@ -131,7 +134,7 @@ void MachineEtat::handlePREPA_GEN(){//                       VERIF currentTime e
     lcd.print(F("Attention"));
     lcd.setCursor(0,1);
     lcd.print(F("Fermeture"));//Inutile...
-    tone(11, NOTE_A5, 500);
+    tone(11, NoteB, 500);
     entryFlashLED = currentTime;
     digitalWrite(ledPin, HIGH);
     stateLED = true;
@@ -163,7 +166,7 @@ void MachineEtat::handlePREPA_GEN(){//                       VERIF currentTime e
     lcd.print(F("Veuillez choisir"));
     lcd.setCursor(0,1);
     lcd.print(F("le mode"));
-    tone(11, NOTE_A5, 1000);
+    tone(11, NoteB, 1000);
     digitalWrite(ledPin, HIGH);
   }
 }
@@ -178,7 +181,7 @@ void MachineEtat::handlePREPA_ACT(){
     
     stateChoiceAuto = true;
     Serial.println(F("Bouton Auto pressé"));
-    tone(11, NOTE_A5, 1000);
+    tone(11, NoteB, 1000);
     lcd.clear();
     lcd.setCursor(0,0);
     lcd.print(F("Etes-vous sur ?"));
@@ -194,7 +197,7 @@ void MachineEtat::handlePREPA_ACT(){
     lcd.print(F("Dispositif armé"));
     lcd.setCursor(0,1);
     lcd.print(F("Fermeture"));
-    tone(11, NOTE_A5, 1000);
+    tone(11, NoteB, 1000);
     delay(5000);
     display.setBrightness(0x00);
     myservo.write(0);
@@ -203,17 +206,71 @@ void MachineEtat::handlePREPA_ACT(){
   if (ButtonBPRetard()) {
     currentState = State::PREPA_MODE_RETARD;
     Serial.println(F("Bouton Retard pressé"));
-    tone(11, NOTE_A5, 1000);
+    tone(11, NoteB, 1000);
     lcd.clear();
     lcd.setCursor(0,0);
     lcd.print(F("Choisir code"));
   }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////// ICI
 void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
   if (ButtonBPArm()) {
+    IsCode = false;
     desarm();
+  }
+  
+  char key = customKeypad.getKey();
+  if (key) {
+    if (IsCode) {
+      if (key == "*") {
+        tone(11,NotePB,1000);
+        if (EssaiCode.length() >= 0) {
+          EssaiCode.remove(-1,1);
+        }
+      } else if ((key == "#") and (Code == EssaiCode)){
+        currentState = State::PREPA_MODE_RETARD;
+        Serial.println(F("Code bon"));
+        tone(11,NoteB,1000);
+        //prepa phase suivante ///////////////////////////////////////////////////////////////////// ICI
+      } else if (EssaiCode.length() >= 15) {
+        tone(11,NotePB,1000);
+        Serial.println(F("Code trop long"));
+      } else {
+        tone(11,NoteB,1000);
+        EssaiCode += key;
+        Serial.println(F("Caractère ajouté"));
+        lcd.setCursor(0,1);
+        lcd.print(F("                "));
+        lcd.print(EssaiCode);
+      }
+    } else {
+      if (key == "*") {
+        tone(11,NotePB,1000);
+        if (Code.length() >= 0) {
+          Code.remove(-1,1);
+        }
+      } else if (key == "#"){
+        if (Code.length() == 0) {
+          tone(11,NotePB,1000);
+          Serial.println(F("Code vide"));
+        } else {
+          IsCode = true;
+          tone(11,NotePB,1000);
+          lcd.setCursor(0,1);
+          lcd.print(F("                "));
+        }
+      } else if (Code.length() >= 15) {
+        tone(11,NotePB,1000);
+        Serial.println(F("Code trop long"));  
+      } else {
+        tone(11,NoteB,1000);
+        Code += key;
+        Serial.println(F("Caractère ajouté"));
+        lcd.setCursor(0,1);
+        lcd.print(F("                "));
+        lcd.print(Code);
+      }
+    }
   }
 }
 

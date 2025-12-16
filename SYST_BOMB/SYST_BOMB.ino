@@ -77,6 +77,9 @@ unsigned long entryFlashLED = 0;
 bool stateLED = false;
 bool stateChoiceAuto = false;
 const unsigned long maxSecondsPREPA_GEN = 30; // durée max autorisée
+bool IsCode = false;
+String Code = "";
+String EssaiCode = "";
 
 char buffer[4] = {'0','0','0','0'};
 bool countdownStarted = false;
