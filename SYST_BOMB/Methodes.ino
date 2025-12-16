@@ -163,7 +163,7 @@ void MachineEtat::handlePREPA_GEN(){//                       VERIF currentTime e
     lcd.print(F("Veuillez choisir"));
     lcd.setCursor(0,1);
     lcd.print(F("le mode"));
-    tone(11, NOTE_A5, 500);
+    tone(11, NOTE_A5, 1000);
     digitalWrite(ledPin, HIGH);
   }
 }
@@ -171,17 +171,42 @@ void MachineEtat::handlePREPA_GEN(){//                       VERIF currentTime e
 
 void MachineEtat::handlePREPA_ACT(){
   if (ButtonBPArm()) {
+    stateChoiceAuto = false;
     desarm();
   }
   if (ButtonBPAuto()) {
-    currentState = State::PREPA_MODE_AUTO;
-    Serial.println(F("Bouton Auto pressé -> PREPA_MODE_AUTO"));
-    //affichage texte
+    
+    stateChoiceAuto = true;
+    Serial.println(F("Bouton Auto pressé"));
+    tone(11, NOTE_A5, 1000);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(F("Etes-vous sur ?"));
+    lcd.setCursor(0,1);
+    lcd.print(F("Presser Confirm"));
   }
+  
+  if(ButtonBPConf() and stateChoiceAuto) {
+    currentState = State::ARM_AUTO;
+    Serial.println(F("Passage ARM_AUTO"));
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(F("Dispositif armé"));
+    lcd.setCursor(0,1);
+    lcd.print(F("Fermeture"));
+    tone(11, NOTE_A5, 1000);
+    delay(5000);
+    display.setBrightness(0x00);
+    myservo.write(0);
+  }
+
   if (ButtonBPRetard()) {
     currentState = State::PREPA_MODE_RETARD;
-    Serial.println(F("Bouton Retard pressé -> PREPA_MODE_RETARD"));
-    //affichage texte
+    Serial.println(F("Bouton Retard pressé"));
+    tone(11, NOTE_A5, 1000);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(F("Choisir code"));
   }
 }
 
@@ -189,12 +214,6 @@ void MachineEtat::handlePREPA_ACT(){
 void MachineEtat::handlePREPA_MODE_AUTO(){
   if (ButtonBPArm()) {
     desarm();
-  }
-  
-  if (ButtonBPConf()) {
-    currentState = State::ARM_AUTO;
-    Serial.println(F("Bouton CONF pressé -> ARM_AUTO"));
-    //Allumage système (indication écran, timer avant armement)
   }
 }
 
