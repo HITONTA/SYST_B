@@ -210,7 +210,7 @@ void MachineEtat::handlePREPA_ACT(){
   }
 }
 
-
+/////////////////////////////////////////////////////////////////////////////////////////////////// ICI
 void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
   if (ButtonBPArm()) {
     desarm();
