@@ -257,7 +257,7 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
         Serial.println(F("Caractère ajouté"));
         lcd.setCursor(0,1);
         lcd.print(F("                "));
-        Serial.println(F(EssaiCode));
+        Serial.println(EssaiCode);
         lcd.print(EssaiCode);
       }
     } else {
@@ -288,7 +288,7 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
         Serial.println(F("Caractère ajouté"));
         lcd.setCursor(0,1);
         lcd.print(F("                "));
-        Serial.println(F(Code));
+        Serial.println(Code);
         lcd.print(Code);
       }
     }
