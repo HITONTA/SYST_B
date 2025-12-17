@@ -201,6 +201,7 @@ void MachineEtat::handlePREPA_ACT(){
     delay(5000);
     display.setBrightness(0x00);
     myservo.write(0);
+    digitalWrite(ledPin,LOW);
   }
 
   if (ButtonBPRetard()) {
@@ -238,6 +239,7 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
           lcd.print(F("Choisir un jour"));
           lcd.setCursor(0,1);
           lcd.print(F("J + 0"));
+          digitalWrite(ledPin,LOW);
         } else {
           tone(11,NotePB,1000);
           Serial.println(F("Code pas bon"));
