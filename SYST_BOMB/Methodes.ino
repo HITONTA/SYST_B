@@ -204,8 +204,8 @@ void MachineEtat::handlePREPA_ACT(){
   }
 
   if (ButtonBPRetard()) {
-    currentState = State::PREPA_MODE_RETARD;
-    Serial.println(F("Bouton Retard pressé"));
+    currentState = State::PREPA_MODE_RETARD_CODE;
+    Serial.println(F("Bouton Retard pressé, passage prepa code"));
     tone(11, NoteB, 1000);
     lcd.clear();
     lcd.setCursor(0,0);
@@ -227,16 +227,25 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
         if (EssaiCode.length() >= 0) {
           EssaiCode.remove(-1,1);
         }
-      } else if ((key == "#") and (Code == EssaiCode)){
-        currentState = State::PREPA_MODE_RETARD;
-        Serial.println(F("Code bon"));
-        tone(11,NoteB,1000);
-        IsCode = false;
-        lcd.clear();
-        lcd.setCursor(0,0);
-        lcd.print(F("Choisir un jour"));
-        lcd.setCursor(0,1);
-        lcd.print(F("J + 0"));
+      } else if ((key == "#")){
+        if (Code == EssaiCode) {
+          currentState = State::PREPA_MODE_RETARD;
+          Serial.println(F("Code bon, passage prepa retard"));
+          tone(11,NoteB,1000);
+          IsCode = false;
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print(F("Choisir un jour"));
+          lcd.setCursor(0,1);
+          lcd.print(F("J + 0"));
+        } else {
+          tone(11,NotePB,1000);
+          Serial.println(F("Code pas bon"));
+          EssaiCode = "";
+          lcd.setCursor(0,1);
+          lcd.print(F("                "));
+        }
+        
       } else if (EssaiCode.length() >= 15) {
         tone(11,NotePB,1000);
         Serial.println(F("Code trop long"));
@@ -261,8 +270,9 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
         } else {
           IsCode = true;
           tone(11,NotePB,1000);
-          lcd.setCursor(0,1);
-          lcd.print(F("                "));
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print(F("Confirmer code"));
         }
       } else if (Code.length() >= 15) {
         tone(11,NotePB,1000);
