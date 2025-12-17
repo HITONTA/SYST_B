@@ -264,8 +264,9 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
       if (key == '*') {
         tone(11,NotePB,1000);
         if (Code.length() >= 0) {
-          Code.remove(-1,1);
+          Code.remove(0,1);
           Serial.println(F("Caractère supprimé"));
+          Serial.println(Code);
         }
       } else if (key == '#'){
         if (Code.length() == 0) {
