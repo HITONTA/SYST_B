@@ -223,12 +223,12 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
   char key = customKeypad.getKey();
   if (key) {
     if (IsCode) {
-      if (key == "*") {
+      if (key == '*') {
         tone(11,NotePB,1000);
         if (EssaiCode.length() >= 0) {
           EssaiCode.remove(-1,1);
         }
-      } else if ((key == "#")){
+      } else if ((key == '#')){
         if (Code == EssaiCode) {
           currentState = State::PREPA_MODE_RETARD;
           Serial.println(F("Code bon, passage prepa retard"));
@@ -260,12 +260,12 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
         lcd.print(EssaiCode);
       }
     } else {
-      if (key == "*") {
+      if (key == '*') {
         tone(11,NotePB,1000);
         if (Code.length() >= 0) {
           Code.remove(-1,1);
         }
-      } else if (key == "#"){
+      } else if (key == '#'){
         if (Code.length() == 0) {
           tone(11,NotePB,1000);
           Serial.println(F("Code vide"));
