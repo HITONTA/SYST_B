@@ -225,7 +225,7 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
       if (key == '*') {
         tone(11,NotePB,1000);
         if (EssaiCode.length() >= 0) {
-          EssaiCode.remove(-1,1);
+          EssaiCode.remove((EssaiCode.length())-1,1);
           Serial.println(F("Caractère supprimé"));
         }
       } else if ((key == '#')){
