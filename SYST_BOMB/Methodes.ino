@@ -117,7 +117,6 @@ void MachineEtat::handleVEILLE(){
 
 
 void MachineEtat::handlePREPA_GEN(){//                       VERIF currentTime est en secondes
-  detection();
 
   if (stateLED and ((currentTime - entryTimePREPA_GEN) >= 1)) {
     digitalWrite(ledPin, LOW);
@@ -227,6 +226,7 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
         tone(11,NotePB,1000);
         if (EssaiCode.length() >= 0) {
           EssaiCode.remove(-1,1);
+          Serial.println(F("Caractère supprimé"));
         }
       } else if ((key == '#')){
         if (Code == EssaiCode) {
@@ -257,6 +257,7 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
         Serial.println(F("Caractère ajouté"));
         lcd.setCursor(0,1);
         lcd.print(F("                "));
+        Serial.println(F(EssaiCode));
         lcd.print(EssaiCode);
       }
     } else {
@@ -264,6 +265,7 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
         tone(11,NotePB,1000);
         if (Code.length() >= 0) {
           Code.remove(-1,1);
+          Serial.println(F("Caractère supprimé"));
         }
       } else if (key == '#'){
         if (Code.length() == 0) {
@@ -275,6 +277,7 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
           lcd.clear();
           lcd.setCursor(0,0);
           lcd.print(F("Confirmer code"));
+          Serial.println(F("code validé"));
         }
       } else if (Code.length() >= 15) {
         tone(11,NotePB,1000);
@@ -285,6 +288,7 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
         Serial.println(F("Caractère ajouté"));
         lcd.setCursor(0,1);
         lcd.print(F("                "));
+        Serial.println(F(Code));
         lcd.print(Code);
       }
     }
