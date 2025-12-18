@@ -200,7 +200,8 @@ void MachineEtat::handlePREPA_ACT(){
     delay(5000);
     display.setBrightness(0x00);
     myservo.write(0);
-    digitalWrite(ledPin,LOW);
+    lastBlinkTime = currentTime;
+    stateLED = true;
   }
 
   if (ButtonBPRetard()) {
@@ -306,8 +307,25 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
 
 
 void MachineEtat::handleARM_AUTO(){
-  //led,buzzer
-  //if detect -> state::boom
+  a = detection();
+
+  if (a <= 15) {
+    Serial.println(F("Kaboom dans 5s"));
+    currentState = State::BOOM;
+    //prepa boom /////////////////////////////////////////////////////////////////////////////// ICI
+  }
+  if ((currentTime - lastBlinkTime) >= 3) {
+    lastBlinkTime = currentTime;
+    if (stateLED) {
+      digitalWrite(ledPin, LOW);
+      stateLED = false;
+      
+    } else {
+      tone(11, NoteB, 1000);
+      digitalWrite(ledPin, LOW);
+      stateLED = true;
+    }
+  }
 }
 
 
@@ -325,7 +343,7 @@ void MachineEtat::handleBOOM(){
 
 void MachineEtat::handleDESARM(){
   //buzzer victoire, led
-  //tandby 5sec puis retour prepa_gen
+  //standby 5sec puis retour prepa_gen
 }
 
 
