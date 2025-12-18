@@ -145,6 +145,7 @@ void MachineEtat::handlePREPA_GEN(){//                       VERIF currentTime e
     // Avertissement fermeture
     lcd.setCursor(0,1);
     lcd.print(F("                ")); //effacement ligne 2
+    lcd.setCursor(0,1);
     lcd.print(F("Veille dans "));
     lcd.setCursor(12,1);
     lcd.print(maxSecondsPREPA_GEN - (currentTime - entryTimePREPA_GEN));
@@ -193,7 +194,7 @@ void MachineEtat::handlePREPA_ACT(){
     Serial.println(F("Passage ARM_AUTO"));
     lcd.clear();
     lcd.setCursor(0,0);
-    lcd.print(F("Dispositif armé"));
+    lcd.print(F("Dispositif arme"));
     lcd.setCursor(0,1);
     lcd.print(F("Fermeture"));
     tone(11, NoteB, 500);
@@ -228,6 +229,11 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
         if (EssaiCode.length() >= 0) {
           EssaiCode.remove((EssaiCode.length())-1,1);
           Serial.println(F("Caractère supprimé"));
+          lcd.setCursor(0,1);
+          lcd.print(F("                "));
+          Serial.println(EssaiCode);
+          lcd.setCursor(0,1);
+          lcd.print(EssaiCode);
         }
       } else if ((key == '#')){
         if (Code == EssaiCode) {
@@ -259,6 +265,7 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
         lcd.setCursor(0,1);
         lcd.print(F("                "));
         Serial.println(EssaiCode);
+        lcd.setCursor(0,1);
         lcd.print(EssaiCode);
       }
     } else {
@@ -268,6 +275,10 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
           Code.remove((Code.length())-1,1);
           Serial.println(F("Caractère supprimé"));
           Serial.println(Code);
+          lcd.setCursor(0,1);
+          lcd.print(F("                "));
+          lcd.setCursor(0,1);
+          lcd.print(Code);
         }
       } else if (key == '#'){
         if (Code.length() == 0) {
@@ -291,6 +302,7 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
         lcd.setCursor(0,1);
         lcd.print(F("                "));
         Serial.println(Code);
+        lcd.setCursor(0,1);
         lcd.print(Code);
       }
     }
