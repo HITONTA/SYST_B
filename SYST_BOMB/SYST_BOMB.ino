@@ -107,10 +107,10 @@ void setup() {
   myservo.attach(10);
   myservo.write(0); // move servos to center position -> 0°
   Serial.println(F("lets go"));
+  delay(1000);
 }
 
 void loop() {
-  
   machine.update();
 
 
