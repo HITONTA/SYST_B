@@ -140,7 +140,7 @@ void MachineEtat::handlePREPA_GEN(){//                       VERIF currentTime e
     myservo.write(0);
     display.setBrightness(0x00);
     lcd.clear();
-    delay(1000);
+    delay(3000);
   } else {
     // Avertissement fermeture
     lcd.setCursor(0,1);
@@ -248,7 +248,7 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
           lcd.print(F("Choisir un jour"));
           lcd.setCursor(0,1);
           lcd.print(F("J + 0"));
-          EssaiCode = "";
+          EssaiCode = "0";
         } else {
           tone(11,NotePB,500);
           Serial.println(F("Code pas bon"));
@@ -328,7 +328,7 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
       lcd.setCursor(4,1);
       lcd.print(EssaiCode);
     } else if ((key == '#')){
-      currentState = State::ARM_RETARD;
+      currentState = State::ARM_RETARD; /////////////// à changer
       Serial.println(F("Date confirmée"));
       tone(11,NoteB,500);
       lcd.clear();
@@ -343,19 +343,14 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
         tone(11,NotePB,500);
         Serial.println(F("Pas bon"));
     } else {
-      if (EssaiCode.length() == 0) {
-        tone(11,NoteB,500);
-        EssaiCode += key;
-        Serial.println(F("Caractère ajouté"));
-        lcd.setCursor(4,1);
-        lcd.print(F(" "));
-        Serial.println(EssaiCode);
-        lcd.setCursor(4,1);
-        lcd.print(EssaiCode);
-      } else {
-        tone(11,NotePB,500);
-        Serial.println(F("Trop de caractères"));
-      }
+      tone(11,NoteB,500);
+      EssaiCode = key;
+      Serial.println(F("Caractère ajouté"));
+      lcd.setCursor(4,1);
+      lcd.print(F(" "));
+      Serial.println(EssaiCode);
+      lcd.setCursor(4,1);
+      lcd.print(EssaiCode);
     }
   }
 }
