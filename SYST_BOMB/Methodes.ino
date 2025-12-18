@@ -337,11 +337,13 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
       lcd.setCursor(0,1);
       lcd.print(F("Format HH:MM"));
       digitalWrite(ledPin,LOW);
+      jour = EssaiCode.toInt();
+      EssaiCode = "";
     }  else if ((key == 'A') or (key == 'B') or (key == 'C') or (key == 'D')) {
         tone(11,NotePB,500);
         Serial.println(F("Pas bon"));
     } else {
-      if (EssaiCode.length() != 0) {
+      if (EssaiCode.length() == 0) {
         tone(11,NoteB,500);
         EssaiCode += key;
         Serial.println(F("Caractère ajouté"));

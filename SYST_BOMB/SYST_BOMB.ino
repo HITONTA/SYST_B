@@ -76,6 +76,7 @@ unsigned long entryTimePREPA_GEN = 0; // Pour RTC
 unsigned long entryFlashLED = 0;
 bool stateLED = false;
 bool stateChoiceAuto = false;
+int jour = 0;
 const unsigned long maxSecondsPREPA_GEN = 30; // durée max autorisée
 bool IsCode = false;
 String Code = "";
