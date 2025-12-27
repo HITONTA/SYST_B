@@ -311,46 +311,84 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////// ICI  
+
 void MachineEtat::handlePREPA_MODE_RETARD(){
   if (ButtonBPArm()) {
+    IsCode = false; //sert a savoir si le jour a été renseigné
     desarm();
   }
   char key = customKeypad.getKey();
-  if (key){
-    if (key == '*') {
-      tone(11,NotePB,500);
-      EssaiCode = "";
-      Serial.println(F("Caractère supprimé"));
-      lcd.setCursor(4,1);
-      lcd.print(F(" "));
-      Serial.println(EssaiCode);
-      lcd.setCursor(4,1);
-      lcd.print(EssaiCode);
-    } else if ((key == '#')){
-      currentState = State::ARM_RETARD; /////////////// à changer
-      Serial.println(F("Date confirmée"));
-      tone(11,NoteB,500);
-      lcd.clear();
-      lcd.setCursor(0,0);
-      lcd.print(F("Choisir heure"));
-      lcd.setCursor(0,1);
-      lcd.print(F("Format HH:MM"));
-      digitalWrite(ledPin,LOW);
-      jour = EssaiCode.toInt();
-      EssaiCode = "";
-    }  else if ((key == 'A') or (key == 'B') or (key == 'C') or (key == 'D')) {
+  if (not(IsCode)) {
+    if (key){
+      if (key == '*') {
+        tone(11,NotePB,500);
+        EssaiCode = ""; // var contenant le jour
+        Serial.println(F("Caractère supprimé"));
+        lcd.setCursor(4,1);
+        lcd.print(F(" "));
+        Serial.println(EssaiCode);
+        lcd.setCursor(4,1);
+        lcd.print(EssaiCode);
+      } else if ((key == '#')){
+        IsCode = true;
+        Serial.println(F("Date confirmée"));
+        tone(11,NoteB,500);
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print(F("Choisir heure"));
+        lcd.setCursor(0,1);
+        lcd.print(F("Format HH:MM"));
+        digitalWrite(ledPin,LOW);
+        jour = EssaiCode.toInt();
+        EssaiCode = "";
+      }  else if ((key == 'A') or (key == 'B') or (key == 'C') or (key == 'D')) {
+          tone(11,NotePB,500);
+          Serial.println(F("Pas bon"));
+      } else {
+        tone(11,NoteB,500);
+        EssaiCode = key;
+        Serial.println(F("Caractère ajouté"));
+        lcd.setCursor(4,1);
+        lcd.print(F(" "));
+        Serial.println(EssaiCode);
+        lcd.setCursor(4,1);
+        lcd.print(EssaiCode);
+      }
+    }
+  } else {
+    if (key){ ///////////////////////////////////////////////////////////////////////////////// à compléter remplissage heure
+      if (key == '*') {
+        tone(11,NotePB,500);
+        if (EssaiCode != "") {
+          EssaiCode.remove((EssaiCode.length())-1,1);
+          Serial.println(F("Caractère supprimé"));
+          Serial.println(Code);
+        }
+        ////////////////////////////////////////////////////////////////////affichage
+      } else if ((key == '#')){
+        if (EssaiCode.length() == 4) {
+          Serial.println(EssaiCode.substring(0,2)); ////////////////////////////////////////////////// verifier print bien 2 prem et 2 der caractères
+          Serial.println(EssaiCode.substring(2,4));
+          if (((EssaiCode.substring(0,2)).toInt() < 24) and ((EssaiCode.substring(2,4)).toInt() < 60)) {
+            if ((jour == 0 and true) or jour != 0) {
+              ////////////////////////////////////////////////////////////////////////////// verif /rapport h actuelle si j = 0 sinon passe automatiquement
+              ////////////////////////// 
+            }
+          }
+        }
+      } else if ((key == 'A') or (key == 'B') or (key == 'C') or (key == 'D')) {
         tone(11,NotePB,500);
         Serial.println(F("Pas bon"));
-    } else {
-      tone(11,NoteB,500);
-      EssaiCode = key;
-      Serial.println(F("Caractère ajouté"));
-      lcd.setCursor(4,1);
-      lcd.print(F(" "));
-      Serial.println(EssaiCode);
-      lcd.setCursor(4,1);
-      lcd.print(EssaiCode);
+      } else if (EssaiCode.length() != 4) {
+        tone(11,NoteB,500);
+        EssaiCode += key;
+        Serial.println(F("Caractère ajouté"));
+        Serial.println(EssaiCode);
+        /////////////////////////////////////////////////////// affichage
+      } else {
+        tone(11,NotePB,500);
+        Serial.println(F("Pas bon"));
+      }
     }
   }
 }
@@ -362,7 +400,7 @@ void MachineEtat::handleARM_AUTO(){
   if (a <= 15) {
     Serial.println(F("Kaboom dans 5s"));
     currentState = State::BOOM;
-    //prepa boom /////////////////////////////////////////////////////////////////////////////// ICI
+    //prepa boom /////////////////////////////////////////////////////////////////////////////// à faire
   }
   if ((currentTime - lastBlinkTime) >= 3) {
     lastBlinkTime = currentTime;
@@ -380,18 +418,18 @@ void MachineEtat::handleARM_AUTO(){
 
 
 void MachineEtat::handleARM_RETARD(){
-  
+  ///////////////////////////////////////////////////////////////////////////////////////////////// à faire
 }
 
 
-void MachineEtat::handleBOOM(){
+void MachineEtat::handleBOOM(){ ////////////////////////////////////////////////////////////////// à faire
   //buzzer rapide, timer 10 sec, led, boom
   //fin après 10sec
   //standby 5sec puis retour prepa_gen
 }
 
 
-void MachineEtat::handleDESARM(){
+void MachineEtat::handleDESARM(){ ////////////////////////////////////////////////////////////// à faire
   //buzzer victoire, led
   //standby 5sec puis retour prepa_gen
 }
