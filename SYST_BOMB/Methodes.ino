@@ -251,6 +251,7 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
       } else if ((key == '#')){
         if (Code == EssaiCode) {
           currentState = State::PREPA_MODE_RETARD;
+          countdownStarted = false;
           Serial.println(F("Code bon, passage prepa retard"));
           tone(11,NoteB,500);
           IsCode = false;
@@ -324,8 +325,17 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
 
 
 void MachineEtat::handlePREPA_MODE_RETARD(){
+
+  if (countdownStarted and (currentTime - entryTimePREPA_GEN < 5)) { // fermeture
+    myservo.write(0);
+    lcd.clear();
+    currentState = State::ARM_RETARD;
+    Serial.println(F("passage arm retard"));
+  }
+  
   if (ButtonBPArm()) {
     IsCode = false; //sert a savoir si le jour a été renseigné
+    countdownStarted = false;
     desarm();
   }
   char key = customKeypad.getKey();
@@ -379,14 +389,32 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
         }
       } else if ((key == '#')){
         if (EssaiCode.length() == 4) {
-          Serial.println(EssaiCode.substring(0,2));
-          Serial.println(EssaiCode.substring(2,4));
-          if (((EssaiCode.substring(0,2)).toInt() < 24) and ((EssaiCode.substring(2,4)).toInt() < 60)) {
+          heure_ret = EssaiCode.substring(0,2).toInt();
+          minute_ret = EssaiCode.substring(2,4).toInt();
+          Serial.println(heure_ret);
+          Serial.println(minute_ret);
+          if ((heure_ret < 24) and (minute_ret < 60)) {
             if ((jour == 0 and true) or jour != 0) {
-              ////////////////////////////////////////////////////////////////////////////// verif /rapport h actuelle si j = 0 sinon passe automatiquement
-              ////////////////////////// 
+              //////////////////////////////////////////////////////////////////////////////////////////////// verif /rapport h actuelle si j = 0 sinon passe automatiquement
+              tone(11,NoteB,500);
+              Serial.println(F("heure validée : fermeture"));
+              countdownStarted = true; // permet de savoir si le temps a été validé
+              entryTimePREPA_GEN = currentTime; // temps depuis confirmation
+              lcd.clear();
+              lcd.setCursor(0,0);
+              lcd.print(F("Fermeture"));
+              EssaiCode = "";
+            } else {
+              Serial.println(F("temps antérieur"));
+              tone(11,NotePB,500);
             }
+          } else {
+            Serial.println(F("out of range time"));
+            tone(11,NotePB,500);
           }
+        } else {
+          Serial.println(F("code trop court"));
+          tone(11,NotePB,500);
         }
       } else if ((key == 'A') or (key == 'B') or (key == 'C') or (key == 'D')) {
         tone(11,NotePB,500);

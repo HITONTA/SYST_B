@@ -81,6 +81,8 @@ const unsigned long maxSecondsPREPA_GEN = 30; // durée max autorisée
 bool IsCode = false;
 String Code = "";
 String EssaiCode = "";
+int heure_ret = 0;
+int minute_ret = 0;
 
 char buffer[4] = {'0','0','0','0'};
 bool countdownStarted = false;
