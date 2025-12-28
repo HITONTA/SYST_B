@@ -67,6 +67,17 @@ unsigned NotePB = NOTE_C5; //Note pas bien
 
 // Définition des fonctions ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+// AFFICHAGE BUFFER (TM1637)
+
+void displayBuffer() {
+  int num = (buffer[0]-'0')*1000 + (buffer[1]-'0')*100 + (buffer[2]-'0')*10 + (buffer[3]-'0');
+  display.showNumberDec(num, true);
+  Serial.print(F("Buffer: "));
+  for(int i=0;i<4;i++) Serial.print(buffer[i]);
+  Serial.println();
+}
+
+
 // Récupération distance
 
 int detection() {
@@ -356,18 +367,19 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
       }
     }
   } else {
-    if (key){ ///////////////////////////////////////////////////////////////////////////////// à compléter remplissage heure
+    if (key){
       if (key == '*') {
         tone(11,NotePB,500);
         if (EssaiCode != "") {
           EssaiCode.remove((EssaiCode.length())-1,1);
+          buffer[EssaiCode.length()] = key;
           Serial.println(F("Caractère supprimé"));
           Serial.println(Code);
+          displayBuffer();
         }
-        ////////////////////////////////////////////////////////////////////affichage
       } else if ((key == '#')){
         if (EssaiCode.length() == 4) {
-          Serial.println(EssaiCode.substring(0,2)); ////////////////////////////////////////////////// verifier print bien 2 prem et 2 der caractères
+          Serial.println(EssaiCode.substring(0,2));
           Serial.println(EssaiCode.substring(2,4));
           if (((EssaiCode.substring(0,2)).toInt() < 24) and ((EssaiCode.substring(2,4)).toInt() < 60)) {
             if ((jour == 0 and true) or jour != 0) {
@@ -381,10 +393,11 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
         Serial.println(F("Pas bon"));
       } else if (EssaiCode.length() != 4) {
         tone(11,NoteB,500);
+        buffer[EssaiCode.length()] = key;
         EssaiCode += key;
         Serial.println(F("Caractère ajouté"));
         Serial.println(EssaiCode);
-        /////////////////////////////////////////////////////// affichage
+        displayBuffer();
       } else {
         tone(11,NotePB,500);
         Serial.println(F("Pas bon"));
