@@ -394,8 +394,7 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
           Serial.println(heure_ret);
           Serial.println(minute_ret);
           if ((heure_ret < 24) and (minute_ret < 60)) {
-            if ((jour == 0 and true) or jour != 0) {
-              //////////////////////////////////////////////////////////////////////////////////////////////// verif /rapport h actuelle si j = 0 sinon passe automatiquement
+            if ((jour == 0 and (((dt.hour == heure_ret) and (dt.minute < 58) and (minute_ret > (dt.minute + 2))) or (((dt.hour + 1) == heure_ret) and (((dt.minute > 58) and (minute_ret > 1)) or (minute_ret < 59))) or ((dt.hour + 1) < heure_ret))) or ((jour == 1) and (((dt.hour == 23) and ((dt.minute < 59) or ((dt.minute < 58) and ((heure_ret > 0) or (minute_ret > 1))))) or (dt.hour != 23))) or (jour > 1)) {
               tone(11,NoteB,500);
               Serial.println(F("heure validée : fermeture"));
               countdownStarted = true; // permet de savoir si le temps a été validé
