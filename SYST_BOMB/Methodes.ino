@@ -404,6 +404,7 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
               lcd.setCursor(0,0);
               lcd.print(F("Fermeture"));
               EssaiCode = "";
+              /////////////////////////////////////////////////////////////////////////////////////////////// calcul t explosion en sec
             } else {
               Serial.println(F("temps antérieur"));
               tone(11,NotePB,500);
