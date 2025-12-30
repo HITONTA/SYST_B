@@ -362,6 +362,7 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
         digitalWrite(ledPin,LOW);
         jour = EssaiCode.toInt();
         EssaiCode = "";
+        displayBuffer();
       }  else if ((key == 'A') or (key == 'B') or (key == 'C') or (key == 'D')) {
           tone(11,NotePB,500);
           Serial.println(F("Pas bon"));
@@ -382,9 +383,10 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
         tone(11,NotePB,500);
         if (EssaiCode != "") {
           EssaiCode.remove((EssaiCode.length())-1,1);
-          buffer[EssaiCode.length()] = key;
+          buffer[EssaiCode.length()] = '0';
           Serial.println(F("Caractère supprimé"));
-          Serial.println(Code);
+          Serial.println(EssaiCode);
+          Serial.println(buffer);
           displayBuffer();
         }
       } else if ((key == '#')){
@@ -425,6 +427,7 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
         EssaiCode += key;
         Serial.println(F("Caractère ajouté"));
         Serial.println(EssaiCode);
+        Serial.println(buffer);
         displayBuffer();
       } else {
         tone(11,NotePB,500);
