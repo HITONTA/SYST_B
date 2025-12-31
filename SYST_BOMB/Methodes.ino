@@ -69,9 +69,9 @@ unsigned NotePB = NOTE_C5; //Note pas bien
 
 // AFFICHAGE BUFFER (TM1637)
 
-void displayBuffer() {
+void displayBuffer(uint8_t dots) {
   int num = (buffer[0]-'0')*1000 + (buffer[1]-'0')*100 + (buffer[2]-'0')*10 + (buffer[3]-'0');
-  display.showNumberDec(num, true);
+  display.showNumberDecEx(num, dots, true);
   Serial.print(F("Buffer: "));
   for(int i=0;i<4;i++) Serial.print(buffer[i]);
   Serial.println();
@@ -338,6 +338,10 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
   if (ButtonBPArm()) {
     IsCode = false; //sert a savoir si le jour a été renseigné
     countdownStarted = false;
+    buffer[0] = '0';
+    buffer[1] = '0';
+    buffer[2] = '0';
+    buffer[3] = '0';
     desarm();
   }
   char key = customKeypad.getKey();
@@ -364,7 +368,7 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
         digitalWrite(ledPin,LOW);
         jour = EssaiCode.toInt();
         EssaiCode = "";
-        displayBuffer();
+        displayBuffer(0x40);
       }  else if ((key == 'A') or (key == 'B') or (key == 'C') or (key == 'D')) {
           tone(11,NotePB,500);
           Serial.println(F("Pas bon"));
@@ -389,7 +393,7 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
           Serial.println(F("Caractère supprimé"));
           Serial.println(EssaiCode);
           Serial.println(buffer);
-          displayBuffer();
+          displayBuffer(0x40);
         }
       } else if ((key == '#')){
         if (EssaiCode.length() == 4) {
@@ -433,7 +437,7 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
         Serial.println(F("Caractère ajouté"));
         Serial.println(EssaiCode);
         Serial.println(buffer);
-        displayBuffer();
+        displayBuffer(0x40);
       } else {
         tone(11,NotePB,500);
         Serial.println(F("Pas bon"));
@@ -459,7 +463,6 @@ void MachineEtat::handleARM_AUTO(){
     if (stateLED) {
       digitalWrite(ledPin, LOW);
       stateLED = false;
-      
     } else {
       tone(11, NoteB, 500);
       digitalWrite(ledPin, HIGH);
@@ -469,8 +472,45 @@ void MachineEtat::handleARM_AUTO(){
 }
 
 
-void MachineEtat::handleARM_RETARD(){ //////////////////////////////////////////////////////////// à faire
-  ///////////////////////////////////////////////////////////////////////////////////////////////// à faire
+void MachineEtat::handleARM_RETARD(){ //////////////////////////////////////////////////////////// en cours
+  long t_restant = targetUnixTime - currentTime;
+  if (t_restant > 86400) {
+    if (t_restant/86400 != last_affich) {
+      buffer[3] = (char)((t_restant / 86400) + '0');
+      Serial.println(buffer);
+      displayBuffer(0x00);
+      last_affich = t_restant/86400;
+    }
+  } else if (t_restant > 3599) {
+    if (t_restant/60 != last_affich) {
+      buffer[3] = (char)((t_restant / 86400) + '0'); ///////////// à changer
+      Serial.println(buffer);
+      displayBuffer(0x40);
+      last_affich = t_restant/60;
+    }
+  } else {
+    if (t_restant != last_affich) {
+      buffer[3] = (char)((t_restant / 86400) + '0'); ///////////// à changer
+      Serial.println(buffer);
+      displayBuffer(0x80);
+      last_affich = t_restant;
+    }
+  }
+
+  //désamorçage
+
+  if ((currentTime - lastBlinkTime) >= 3) {
+    lastBlinkTime = currentTime;
+    if (stateLED) {
+      digitalWrite(ledPin, LOW);
+      stateLED = false;
+      
+    } else {
+      tone(11, NoteB, 500);
+      digitalWrite(ledPin, HIGH);
+      stateLED = true;
+    }
+  }
 }
 
 

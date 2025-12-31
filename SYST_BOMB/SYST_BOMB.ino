@@ -83,6 +83,7 @@ String Code = "";
 String EssaiCode = "";
 int heure_ret = 0;
 int minute_ret = 0;
+long int last_affich = 0;
 
 char buffer[4] = {'0','0','0','0'};
 bool countdownStarted = false;
