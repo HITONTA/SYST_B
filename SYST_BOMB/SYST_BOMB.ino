@@ -107,8 +107,12 @@ void setup() {
   pinMode(Bp_Retard, INPUT_PULLUP);
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(LED_PIN, OUTPUT);
+  lcd.begin(16,2);
   myservo.attach(10);
   myservo.write(0); // move servos to center position -> 0°
+  // Définit un timeout de 25ms (25000 us)
+  // Le paramètre 'true' force un reset automatique du bus I2C en cas de timeout
+  Wire.setWireTimeout(25000, true);
   Serial.println(F("lets go"));
   delay(3000);
 }

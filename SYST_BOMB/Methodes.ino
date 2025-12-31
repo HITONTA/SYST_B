@@ -115,7 +115,6 @@ void MachineEtat::handleVEILLE(){
     Serial.println(F("Entrée PREPA_GEN !"));
     myservo.write(90); //                                                Vérif si mouvement servo = non bloquant
     display.setBrightness(0x0f); // Luminosité max (0x00 à 0x0f)
-    lcd.begin(16,2);
     lcd.clear();
     lcd.setCursor(0,0);
     lcd.print(F("Bienvenue|Armer"));
@@ -484,7 +483,8 @@ void MachineEtat::handleDESARM(){ //////////////////////////////////////////////
 void MachineEtat::update() {
   // Lecture temps RTC
   dt = clock.getDateTime();
-  currentTime = dt.hour * 3600UL + dt.minute * 60UL + dt.second;
+  //currentTime = dt.hour * 3600UL + dt.minute * 60UL + dt.second;
+  currentTime = dt.unixtime;
 
   switch (currentState) {
 
