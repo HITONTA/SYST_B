@@ -126,7 +126,7 @@ void MachineEtat::handleVEILLE(){
 }
 
 
-void MachineEtat::handlePREPA_GEN(){//                       VERIF currentTime est en secondes
+void MachineEtat::handlePREPA_GEN(){
 
   if (stateLED and ((currentTime - entryTimePREPA_GEN) >= 1)) {
     digitalWrite(ledPin, LOW);
@@ -328,6 +328,9 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
   if (countdownStarted and (currentTime - entryTimePREPA_GEN < 5)) { // fermeture
     myservo.write(0);
     lcd.clear();
+    digitalWrite(ledPin, LOW);
+    stateLED = false;
+    lastBlinkTime = currentTime;
     currentState = State::ARM_RETARD;
     Serial.println(F("passage arm retard"));
   }
@@ -404,7 +407,10 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
               lcd.setCursor(0,0);
               lcd.print(F("Fermeture"));
               EssaiCode = "";
-              /////////////////////////////////////////////////////////////////////////////////////////////// calcul t explosion en sec
+              // Calcul du timestamp pour aujourd'hui à 00:00:00
+              long midnightToday = currentTime - (dt.hour * 3600L + dt.minute * 60L + dt.second);
+              // Calcul du moment cible absolu
+              targetUnixTime = midnightToday + (jour * 86400L) + (heure_ret * 3600L) + (minute_ret * 60L);
             } else {
               Serial.println(F("temps antérieur"));
               tone(11,NotePB,500);
@@ -441,9 +447,12 @@ void MachineEtat::handleARM_AUTO(){
   a = detection();
 
   if (a <= 15) {
-    Serial.println(F("Kaboom dans 5s"));
+    Serial.println(F("Kaboom"));
+    digitalWrite(ledPin, HIGH);
+    stateLED = true;
+    lastBlinkTime = currentTime;
+    tone(11, NoteB, 1000);
     currentState = State::BOOM;
-    //prepa boom /////////////////////////////////////////////////////////////////////////////// à faire
   }
   if ((currentTime - lastBlinkTime) >= 3) {
     lastBlinkTime = currentTime;
@@ -453,14 +462,14 @@ void MachineEtat::handleARM_AUTO(){
       
     } else {
       tone(11, NoteB, 500);
-      digitalWrite(ledPin, LOW);
+      digitalWrite(ledPin, HIGH);
       stateLED = true;
     }
   }
 }
 
 
-void MachineEtat::handleARM_RETARD(){
+void MachineEtat::handleARM_RETARD(){ //////////////////////////////////////////////////////////// à faire
   ///////////////////////////////////////////////////////////////////////////////////////////////// à faire
 }
 
