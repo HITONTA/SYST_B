@@ -9,7 +9,6 @@ enum class State {
   ARM_AUTO,
   ARM_RETARD,
   BOOM,
-  DESARM,
 };
 
 class MachineEtat {
@@ -33,7 +32,6 @@ private:
     void handleARM_AUTO();
     void handleARM_RETARD();
     void handleBOOM();
-    void handleDESARM();
     void desarm();
 };
 

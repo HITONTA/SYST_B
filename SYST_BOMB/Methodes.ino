@@ -104,7 +104,7 @@ void MachineEtat::desarm() {
 void MachineEtat::handleVEILLE(){
   a = detection();
 
-  if (stateLED and ((currentTime - entryFlashLED) >= 1)) {
+  if (stateLED and ((currentTime - entryFlashLED) >= 1L)) {
     digitalWrite(ledPin, LOW);
     stateLED = false;
   }
@@ -128,7 +128,7 @@ void MachineEtat::handleVEILLE(){
 
 void MachineEtat::handlePREPA_GEN(){
 
-  if (stateLED and ((currentTime - entryTimePREPA_GEN) >= 1)) {
+  if (stateLED and ((currentTime - entryTimePREPA_GEN) >= 1L)) {
     digitalWrite(ledPin, LOW);
     stateLED = false;
   }
@@ -159,7 +159,7 @@ void MachineEtat::handlePREPA_GEN(){
     lcd.print(F("Veille dans "));
     lcd.setCursor(12,1);
     lcd.print(maxSecondsPREPA_GEN - (currentTime - entryTimePREPA_GEN));
-    if ((currentTime - entryTimePREPA_GEN) <= maxSecondsPREPA_GEN - 9) {
+    if ((currentTime - entryTimePREPA_GEN) <= maxSecondsPREPA_GEN - 9L) {
       lcd.setCursor(14,1);
     } else {
       lcd.setCursor(13,1);
@@ -325,10 +325,11 @@ void MachineEtat::handlePREPA_MODE_RETARD_CODE(){
 
 void MachineEtat::handlePREPA_MODE_RETARD(){
 
-  if (countdownStarted and (currentTime - entryTimePREPA_GEN < 5)) { // fermeture
+  if (countdownStarted and (currentTime - entryTimePREPA_GEN < 5L)) { // fermeture
     myservo.write(0);
     lcd.clear();
     digitalWrite(ledPin, LOW);
+    IsCode = false;
     stateLED = false;
     lastBlinkTime = currentTime;
     currentState = State::ARM_RETARD;
@@ -455,10 +456,16 @@ void MachineEtat::handleARM_AUTO(){
     digitalWrite(ledPin, HIGH);
     stateLED = true;
     lastBlinkTime = currentTime;
-    tone(11, NoteB, 1000);
+    tone(11, NotePB, 1000);
     currentState = State::BOOM;
+    myservo.write(90);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(F("BOOM"));
+    EssaiCode = "";
+    Code = "";
   }
-  if ((currentTime - lastBlinkTime) >= 3) {
+  if ((currentTime - lastBlinkTime) >= 3L) {
     lastBlinkTime = currentTime;
     if (stateLED) {
       digitalWrite(ledPin, LOW);
@@ -472,34 +479,131 @@ void MachineEtat::handleARM_AUTO(){
 }
 
 
-void MachineEtat::handleARM_RETARD(){ //////////////////////////////////////////////////////////// en cours
+void MachineEtat::handleARM_RETARD(){
   long t_restant = targetUnixTime - currentTime;
-  if (t_restant > 86400) {
-    if (t_restant/86400 != last_affich) {
-      buffer[3] = (char)((t_restant / 86400) + '0');
+  if (t_restant > 86400L) {
+    if (t_restant/86400L != last_affich) {
+      buffer[3] = (char)((t_restant / 86400L) + '0');
       Serial.println(buffer);
       displayBuffer(0x00);
-      last_affich = t_restant/86400;
+      last_affich = t_restant/86400L;
     }
-  } else if (t_restant > 3599) {
-    if (t_restant/60 != last_affich) {
-      buffer[3] = (char)((t_restant / 86400) + '0'); ///////////// à changer
+  } else if (t_restant > 3599L) {
+    if (t_restant/60L != last_affich) {
+      mustBlink = true;
+      BlinkSec = 30L;
+      int heures_hhmm = t_restant / 3600L;
+      int minutes_hhmm = (t_restant % 3600L) / 60L;
+      buffer[0] = (char)((heures_hhmm / 10) + '0');  // Dizaines d'heures 
+      buffer[1] = (char)((heures_hhmm % 10) + '0');  // Unités d'heures 
+      buffer[2] = (char)((minutes_hhmm / 10) + '0'); // Dizaines de minutes 
+      buffer[3] = (char)((minutes_hhmm % 10) + '0'); // Unités de minutes 
       Serial.println(buffer);
       displayBuffer(0x40);
-      last_affich = t_restant/60;
+      last_affich = t_restant/60L;
     }
-  } else {
+  } else if (t_restant > 0L){
     if (t_restant != last_affich) {
-      buffer[3] = (char)((t_restant / 86400) + '0'); ///////////// à changer
+      mustBlink = true;
+      BlinkSec = 1L;
+      int minutes = t_restant / 60L;
+      int secondes = t_restant % 60L;
+      buffer[0] = (char)((minutes / 10) + '0');  // Dizaines de minutes 
+      buffer[1] = (char)((minutes % 10) + '0');  // Unités de minutes 
+      buffer[2] = (char)((secondes / 10) + '0'); // Dizaines de secondes 
+      buffer[3] = (char)((secondes % 10) + '0'); // Unités de secondes
       Serial.println(buffer);
       displayBuffer(0x80);
       last_affich = t_restant;
     }
+  } else {
+    Serial.println(F("Kaboom"));
+    digitalWrite(ledPin, HIGH);
+    stateLED = true;
+    lastBlinkTime = currentTime;
+    tone(11, NotePB, 1000);
+    currentState = State::BOOM;
+    myservo.write(90);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(F("BOOM"));
+    EssaiCode = "";
+    Code = "";
   }
 
-  //désamorçage
+  if (IsCode) { // si ouvert
+    if ((currentTime-entryTimePREPA_GEN) > 40L) {
+      Serial.println(F("fermeture"));
+      IsCode = false;
+      EssaiCode = "";
+    } else {
+      char key = customKeypad.getKey();
+      if (key) {
+        entryTimePREPA_GEN = currentTime;
+        if (key == '*') {
+          tone(11,NotePB,500);
+          if (EssaiCode.length() > 0) {
+            EssaiCode.remove((EssaiCode.length())-1,1);
+            Serial.println(F("Caractère supprimé"));
+            lcd.setCursor(0,1);
+            lcd.print(F("                "));
+            Serial.println(EssaiCode);
+            lcd.setCursor(0,1);
+            lcd.print(EssaiCode);
+          }
+        } else if ((key == '#')){
+          if (Code == EssaiCode) {
+            currentState = State::BOOM;
+            Serial.println(F("Code bon, désarmé"));
+            tone(11,NoteB,1000);
+            digitalWrite(ledPin, HIGH);
+            stateLED = true;
+            IsCode = false;
+            lcd.clear();
+            lcd.setCursor(0,0);
+            lcd.print(F("Bravo !"));
+            lcd.setCursor(0,1);
+            lcd.print(F("DESAMORCAGE"));
+            lastBlinkTime = currentTime;
+            EssaiCode = "";
+            Code = "";
+          } else {
+            tone(11,NotePB,500);
+            Serial.println(F("Code pas bon"));
+            EssaiCode = "";
+            lcd.setCursor(0,1);
+            lcd.print(F("                "));
+            lcd.setCursor(0,1);
+            lcd.print(F("ERREUR -1min"));
+            t_restant -= 60L;
+          }
+        
+        } else if (EssaiCode.length() >= 15) {
+          tone(11,NotePB,500);
+          Serial.println(F("Code trop long"));
+        } else {
+          tone(11,NoteB,500);
+          EssaiCode += key;
+          Serial.println(F("Caractère ajouté"));
+          lcd.setCursor(0,1);
+          lcd.print(F("                "));
+          Serial.println(EssaiCode);
+          lcd.setCursor(0,1);
+          lcd.print(EssaiCode);
+        }
+      }
+    }
+  } else {
+    a = detection();
+    if (a <= 15) {
+      Serial.println(F("ouverture"));
+      myservo.write(90);
+      entryTimePREPA_GEN = currentTime;
+      IsCode = true;
+    }
+  }
 
-  if ((currentTime - lastBlinkTime) >= 3) {
+  if (((currentTime - lastBlinkTime) >= BlinkSec) and mustBlink) {
     lastBlinkTime = currentTime;
     if (stateLED) {
       digitalWrite(ledPin, LOW);
@@ -514,17 +618,19 @@ void MachineEtat::handleARM_RETARD(){ //////////////////////////////////////////
 }
 
 
-void MachineEtat::handleBOOM(){ ////////////////////////////////////////////////////////////////// à faire
-  //buzzer rapide, timer 10 sec, led, boom
-  //fin après 10sec
-  //standby 5sec puis retour prepa_gen
+void MachineEtat::handleBOOM(){ // fin de jeu
+  if ((currentTime - lastBlinkTime) > 10L) {
+    digitalWrite(ledPin, LOW);
+    stateLED = false;
+    lcd.clear();
+    myservo.write(0);
+    currentState = State::VEILLE;
+    mustBlink =false;
+    delay(1000);
+  }
 }
 
 
-void MachineEtat::handleDESARM(){ ////////////////////////////////////////////////////////////// à faire
-  //buzzer victoire, led
-  //standby 5sec puis retour prepa_gen
-}
 
 
 // Mise à jour des états -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -567,10 +673,6 @@ void MachineEtat::update() {
 
     case State::BOOM:
       handleBOOM();
-      break;
-
-    case State::DESARM:
-      handleDESARM();
       break;
   }
 }
