@@ -118,6 +118,7 @@ void setup() {
   // Le paramètre 'true' force un reset automatique du bus I2C en cas de timeout
   Wire.setWireTimeout(25000, true);
   Serial.println(F("lets go"));
+  display.clear();
   delay(3000);
 }
 
