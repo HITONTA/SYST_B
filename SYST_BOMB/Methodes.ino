@@ -399,7 +399,7 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
         tone(11,NotePB,500);
         if (EssaiCode != "") {
           EssaiCode.remove((EssaiCode.length())-1,1);
-          buffer[EssaiCode.length()] = '-';
+          buffer[EssaiCode.length()] = '0';
           Serial.println(F("Caractère supprimé"));
           Serial.println(EssaiCode);
           Serial.println(buffer);
