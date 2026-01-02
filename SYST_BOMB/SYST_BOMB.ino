@@ -103,7 +103,7 @@ long targetUnixTime = 0;
 
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   clock.begin();
   pinMode(Bp_Arm, INPUT_PULLUP);
   pinMode(Bp_Confirm, INPUT_PULLUP);

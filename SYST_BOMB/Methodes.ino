@@ -81,8 +81,17 @@ void displayBuffer(uint8_t dots) {
 // Récupération distance
 
 int detection() {
-  a=sr04.Distance();
-  return a;
+  //a=sr04.Distance();
+  //return a;
+  static unsigned long lastMeasure = 0;
+  static int lastDist = 999;
+    
+  // Mesure seulement toutes les 100ms
+  if (millis() - lastMeasure >= 100) {
+    lastDist = sr04.Distance();
+    lastMeasure = millis();
+  }
+  return lastDist;
 }
 
 // Fonctions annexes
@@ -138,33 +147,32 @@ void MachineEtat::handlePREPA_GEN(){
   if ((currentTime - entryTimePREPA_GEN) >= maxSecondsPREPA_GEN) {
     Serial.println(F("Temps dépassé PREPA_GEN -> retour VEILLE !"));
     currentState = State::VEILLE;
+    last_affich = 0;
     lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print(F("Attention"));
-    lcd.setCursor(0,1);
-    lcd.print(F("Fermeture"));//Inutile...
     tone(11, NoteB, 500);
     entryFlashLED = currentTime;
     digitalWrite(ledPin, HIGH);
     stateLED = true;
     myservo.write(0);
     display.setBrightness(0x00);
-    lcd.clear();
     delay(3000);
   } else {
     // Avertissement fermeture
-    lcd.setCursor(0,1);
-    lcd.print(F("                ")); //effacement ligne 2
-    lcd.setCursor(0,1);
-    lcd.print(F("Veille dans "));
-    lcd.setCursor(12,1);
-    lcd.print(maxSecondsPREPA_GEN - (currentTime - entryTimePREPA_GEN));
-    if ((currentTime - entryTimePREPA_GEN) <= maxSecondsPREPA_GEN - 9L) {
-      lcd.setCursor(14,1);
-    } else {
-      lcd.setCursor(13,1);
+    if (last_affich != maxSecondsPREPA_GEN - (currentTime - entryTimePREPA_GEN)) {
+      last_affich = maxSecondsPREPA_GEN - (currentTime - entryTimePREPA_GEN);
+      lcd.setCursor(0,1);
+      lcd.print(F("                ")); //effacement ligne 2
+      lcd.setCursor(0,1);
+      lcd.print(F("Veille dans "));
+      lcd.setCursor(12,1);
+      lcd.print(maxSecondsPREPA_GEN - (currentTime - entryTimePREPA_GEN));
+      if ((currentTime - entryTimePREPA_GEN) <= maxSecondsPREPA_GEN - 9L) {
+        lcd.setCursor(14,1);
+      } else {
+        lcd.setCursor(13,1);
+      }
+      lcd.print(F("s"));
     }
-    lcd.print(F("s"));
   }
 
   // Vérification bouton ARM pour passer à l'état suivant
@@ -178,6 +186,7 @@ void MachineEtat::handlePREPA_GEN(){
     lcd.print(F("le mode"));
     tone(11, NoteB, 500);
     digitalWrite(ledPin, HIGH);
+    last_affich = 0;
   }
 }
 
@@ -636,10 +645,14 @@ void MachineEtat::handleBOOM(){ // fin de jeu
 // Mise à jour des états -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 void MachineEtat::update() {
-  // Lecture temps RTC
-  dt = clock.getDateTime();
-  //currentTime = dt.hour * 3600UL + dt.minute * 60UL + dt.second;
-  currentTime = dt.unixtime;
+
+  static unsigned long lastRTCRead = 0;
+  // Lecture du RTC limitée à 5Hz (suffisant pour un timer à la seconde)
+  if (millis() - lastRTCRead >= 200) {
+    dt = clock.getDateTime();
+    currentTime = dt.unixtime;
+    lastRTCRead = millis();
+  }
 
   switch (currentState) {
 
