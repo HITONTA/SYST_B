@@ -348,10 +348,10 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
   if (ButtonBPArm()) {
     IsCode = false; //sert a savoir si le jour a été renseigné
     countdownStarted = false;
-    buffer[0] = '0';
-    buffer[1] = '0';
-    buffer[2] = '0';
-    buffer[3] = '0';
+    buffer[0] = '-';
+    buffer[1] = '-';
+    buffer[2] = '-';
+    buffer[3] = '-';
     desarm();
   }
   char key = customKeypad.getKey();
@@ -399,7 +399,7 @@ void MachineEtat::handlePREPA_MODE_RETARD(){
         tone(11,NotePB,500);
         if (EssaiCode != "") {
           EssaiCode.remove((EssaiCode.length())-1,1);
-          buffer[EssaiCode.length()] = '0';
+          buffer[EssaiCode.length()] = '-';
           Serial.println(F("Caractère supprimé"));
           Serial.println(EssaiCode);
           Serial.println(buffer);
@@ -538,6 +538,11 @@ void MachineEtat::handleARM_RETARD(){
     lcd.print(F("BOOM"));
     EssaiCode = "";
     Code = "";
+    buffer[0] = '0';
+    buffer[1] = '0';
+    buffer[2] = '0';
+    buffer[3] = '0';
+    displayBuffer(0x00);
   }
 
   if (IsCode) { // si ouvert
@@ -635,6 +640,7 @@ void MachineEtat::handleBOOM(){ // fin de jeu
     myservo.write(0);
     currentState = State::VEILLE;
     mustBlink =false;
+    display.clear();
     delay(1000);
   }
 }

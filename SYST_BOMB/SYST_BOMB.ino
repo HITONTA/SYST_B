@@ -87,7 +87,7 @@ long int last_affich = 0;
 bool mustBlink = false;
 long int BlinkSec = 0L;
 
-char buffer[4] = {'0','0','0','0'};
+char buffer[4] = {'-','-','-','-'};
 bool countdownStarted = false;
 bool waitingNewInput = false;
 long targetSeconds = 0;
