@@ -575,7 +575,7 @@ void MachineEtat::handleARM_RETARD(){
             lcd.print(F("                "));
             lcd.setCursor(0,1);
             lcd.print(F("ERREUR -1min"));
-            t_restant -= 60L;
+            targetUnixTime -= 60L;
           }
         
         } else if (EssaiCode.length() >= 15) {
