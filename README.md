@@ -23,7 +23,7 @@ choix code -> confirmation code -> mode prepa retard
 Prepa retard :
 si bp arm -> mode prepa gen
     choix jour :
-    (num) ajout num (ex : j + (num1)(num2)(num3)(num4)) max j + 9999
+    (num) ajout num (ex : j + (num)) max j + 9
     "*" effacer dernier carctère
     "#" confirme date
     
@@ -36,4 +36,7 @@ si bp arm -> mode prepa gen
 
 Arm auto :
 si detection -> 5s -> mode boom
+
+Arm retard:
+si detection -> ouverture, code désamorçage
     
